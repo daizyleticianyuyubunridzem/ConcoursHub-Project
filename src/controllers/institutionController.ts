@@ -3,7 +3,7 @@ import InstitutionService from "../services/institutionService";
 
 class InstitutionController {
 
-//get one institution
+//Get all institution
     async getAllInstitutions(
         req: Request,
         res: Response,
@@ -18,7 +18,7 @@ class InstitutionController {
         }
     }
 
-    // get one institution
+    // Get one institution
     async getInstitutionById(
         req: Request,
         res: Response,

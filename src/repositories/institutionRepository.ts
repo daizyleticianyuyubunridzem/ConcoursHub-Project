@@ -1,6 +1,4 @@
-import Institution , {IInstitution} from "../models/Institution";
-
-
+import Institution , {IInstitution} from "../models/institutionModel";
 class InstitutionRepository {
     async findAll(): Promise<IInstitution[]>{
         return await Institution.find();

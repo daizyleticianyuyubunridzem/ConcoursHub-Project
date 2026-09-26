@@ -28,6 +28,10 @@ const InstitutionSchema = new Schema<IInstitution>({
         type: String,
         trim: true
     },
+     location:{
+        type: String,
+        required: true
+     },
 
     region:{
         type: String,

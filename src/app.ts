@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db';
 import path from 'node:path';
 import InstitutionRoutes from "./routes/institutionRoutes";
+import SchoolRoutes from "./routes/schoolRoutes";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.set ('view engine', 'ejs');
 app.set("views", path.join(__dirname, "views"));
 
 app.use('/institutions', InstitutionRoutes);
+app.use('/schools', SchoolRoutes);
 
 app.get('/', (req, res) => {
     res.send("welcome to concoursHub");

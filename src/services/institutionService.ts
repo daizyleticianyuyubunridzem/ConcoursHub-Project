@@ -1,6 +1,5 @@
 import institutionRepository from "../repositories/institutionRepository";
-
-import { IInstitution } from "../models/Institution";
+import { IInstitution } from "../models/institutionModel";
 
 class InstitutionService {
     async getAllInstitutions(): Promise<IInstitution[]>{
