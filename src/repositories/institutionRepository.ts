@@ -29,4 +29,5 @@ class InstitutionRepository {
     }
 };
 
+// Export one repository instance for use by the Service layer
 export default new InstitutionRepository();

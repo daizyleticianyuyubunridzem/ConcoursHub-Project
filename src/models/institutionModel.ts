@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+// TypeScript interface that defines the structure of an institution
 export interface IInstitution extends Document {
     name: string;
     acronymn?: string;
