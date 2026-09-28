@@ -48,18 +48,16 @@ const requirementSchema = new Schema<IRequirement>(
             trim: true,
         },
 
-        //min grade if application
         minimumGrade: {
             type: String,
             trim: true,
         },
 
-        //mininum age if applicable
+
         minimumAge: {
             type: Number,
         },
         
-         //mininum age if applicable
         maximumAge: {
             type: Number,
         },

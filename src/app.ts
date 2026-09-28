@@ -8,7 +8,8 @@ import SchoolRoutes from "./routes/schoolRoutes";
 import DepartmentRoutes from "./routes/departmentRoutes";
 import ProgrammeRoutes from "./routes/programmeRoutes";
 import AdmissionOpportunityRoutes from "./routes/admissionOpportunityRoutes";
-import ApplicstionSessionRoutes from "./routes/applicationSessionRoutes";
+import ApplicationSessionRoutes from "./routes/applicationSessionRoutes";
+import requirementRoutes from "./routes/requirementRoutes";
 
 dotenv.config();
 
@@ -27,7 +28,8 @@ app.use('/schools', SchoolRoutes);
 app.use('/departments', DepartmentRoutes);
 app.use('/programmes', ProgrammeRoutes);
 app.use('/admission-opportunities', AdmissionOpportunityRoutes)
-app.use('/application-sessions', ApplicstionSessionRoutes);
+app.use('/application-sessions', ApplicationSessionRoutes);
+app.use('/requirements', requirementRoutes);
 
 app.get('/', (req, res) => {
     res.send("welcome to concoursHub");
