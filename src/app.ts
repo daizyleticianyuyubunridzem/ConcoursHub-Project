@@ -10,6 +10,9 @@ import ProgrammeRoutes from "./routes/programmeRoutes";
 import AdmissionOpportunityRoutes from "./routes/admissionOpportunityRoutes";
 import ApplicationSessionRoutes from "./routes/applicationSessionRoutes";
 import requirementRoutes from "./routes/requirementRoutes";
+import userRoutes from './routes/userRoutes';
+import studentProfileRoutes from './routes/studentProfileRoutes';
+import sessionMiddleware from './config/session';
 
 dotenv.config();
 
@@ -19,7 +22,8 @@ connectDB();
 
 app.use(express.json());
 
-//configuring ejs
+app.use(sessionMiddleware);
+
 app.set ('view engine', 'ejs');
 app.set("views", path.join(__dirname, "views"));
 
@@ -30,6 +34,8 @@ app.use('/programmes', ProgrammeRoutes);
 app.use('/admission-opportunities', AdmissionOpportunityRoutes)
 app.use('/application-sessions', ApplicationSessionRoutes);
 app.use('/requirements', requirementRoutes);
+app.use('/users', userRoutes);
+app.use('/student-profiles', studentProfileRoutes);
 
 app.get('/', (req, res) => {
     res.send("welcome to concoursHub");
