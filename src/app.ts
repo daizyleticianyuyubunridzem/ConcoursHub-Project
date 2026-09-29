@@ -1,6 +1,5 @@
 import express from 'express';
-const app = express();
-import dotenv from 'dotenv';
+import "./config/env";
 import connectDB from './config/db';
 import path from 'node:path';
 import InstitutionRoutes from "./routes/institutionRoutes";
@@ -13,8 +12,10 @@ import requirementRoutes from "./routes/requirementRoutes";
 import userRoutes from './routes/userRoutes';
 import studentProfileRoutes from './routes/studentProfileRoutes';
 import sessionMiddleware from './config/session';
+import AuthRoutes from './routes/authRoutes';
 
-dotenv.config();
+
+const app = express();
 
 const PORT = process.env.PORT || 3000;
  
@@ -22,6 +23,7 @@ connectDB();
 
 app.use(express.json());
 
+//session middleware
 app.use(sessionMiddleware);
 
 app.set ('view engine', 'ejs');
@@ -36,6 +38,9 @@ app.use('/application-sessions', ApplicationSessionRoutes);
 app.use('/requirements', requirementRoutes);
 app.use('/users', userRoutes);
 app.use('/student-profiles', studentProfileRoutes);
+
+//authentication routes
+app.use('/auth', AuthRoutes);
 
 app.get('/', (req, res) => {
     res.send("welcome to concoursHub");

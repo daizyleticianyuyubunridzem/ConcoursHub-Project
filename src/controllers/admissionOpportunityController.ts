@@ -1,7 +1,5 @@
-
 import { Request, Response, NextFunction } from "express";
 import AdmissionOpportunityService from "../services/admissionOpportunityService";
-
 class AdmissionOpportunityController {
 
     // Get all admission opportunities
