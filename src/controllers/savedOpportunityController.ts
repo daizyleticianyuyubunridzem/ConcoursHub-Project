@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-
 import SavedOpportunityService from "../services/savedOpportunityService";
-
 class SavedOpportunityController {
 
     // Get all saved opportunities
@@ -45,16 +43,27 @@ class SavedOpportunityController {
         }
     }
 
-    // Get all opportunities saved by a specific user
+    // Get all opportunities saved by the currently logged-in user
     async getSavedOpportunitiesByUser(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
+            // Get the user ID from the authenticated session
+            const userId = req.session.userId;
+
+            // Make sure the user is logged in
+            if (!userId) {
+                res.status(401).json({
+                    message: "Authentication required. Please log in.",
+                });
+                return;
+            }
+
             const savedOpportunities =
                 await SavedOpportunityService.getSavedOpportunitiesByUser(
-                    req.params.userId as string
+                    userId
                 );
 
             res.status(200).json(savedOpportunities);
@@ -63,14 +72,26 @@ class SavedOpportunityController {
         }
     }
 
-    // Save an admission opportunity
+    // Save an admission opportunity for the currently logged-in user
     async saveOpportunity(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            const { userId, opportunityId } = req.body;
+            // Get the logged-in user's ID from the session
+            const userId = req.session.userId;
+
+            // Make sure the user is logged in
+            if (!userId) {
+                res.status(401).json({
+                    message: "Authentication required. Please log in.",
+                });
+                return;
+            }
+
+            // Get only the opportunity ID from the request
+            const { opportunityId } = req.body;
 
             const savedOpportunity =
                 await SavedOpportunityService.saveOpportunity(
@@ -91,11 +112,25 @@ class SavedOpportunityController {
         next: NextFunction
     ): Promise<void> {
         try {
+            // Get the logged-in user's ID from the session
+            const userId = req.session.userId;
+
+            // Make sure the user is logged in
+            if (!userId) {
+                res.status(401).json({
+                    message: "Authentication required. Please log in.",
+                });
+                return;
+            }
+
+            // Remove the saved opportunity only if it belongs to the logged-in user
             const savedOpportunity =
                 await SavedOpportunityService.removeSavedOpportunity(
+                    userId,
                     req.params.id as string
                 );
 
+            // If the saved opportunity does not exist
             if (!savedOpportunity) {
                 res.status(404).json({
                     message: "Saved opportunity not found",
@@ -112,6 +147,5 @@ class SavedOpportunityController {
         }
     }
 }
-
 
 export default new SavedOpportunityController();

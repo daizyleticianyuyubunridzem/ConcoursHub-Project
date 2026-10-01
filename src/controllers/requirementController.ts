@@ -2,8 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import RequirementService from "../services/requirementService";
 
 class RequirementController {
-
-    // get all requirements
+    
     async getAllRequirements(
         req: Request,
         res: Response,

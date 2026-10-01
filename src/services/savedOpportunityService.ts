@@ -52,12 +52,28 @@ class SavedOpportunityService {
         });
     }
 
-    // Remove a saved opportunity
-    async removeSavedOpportunity(
-        id: string
-    ): Promise<ISavedOpportunity | null> {
-        return await savedOpportunityRepository.delete(id);
+    // Remove a saved opportunity only if it belongs to the logged-in user
+async removeSavedOpportunity(
+    userId: string,
+    id: string
+): Promise<ISavedOpportunity | null> {
+
+    // Find the saved opportunity first
+    const savedOpportunity =
+        await savedOpportunityRepository.findById(id);
+
+    if (!savedOpportunity) {
+        return null;
     }
+
+    // Check that the saved opportunity belongs to the logged-in user
+    if (savedOpportunity.user.toString() !== userId) {
+        throw new Error(
+            "You do not have permission to remove this saved opportunity"
+        );
+    }
+    return await savedOpportunityRepository.delete(id);
+}
 }
 
 export default new SavedOpportunityService();

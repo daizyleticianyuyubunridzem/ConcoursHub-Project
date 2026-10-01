@@ -1,7 +1,11 @@
 import { Router } from "express";
 import StudentProfileController from "../controllers/studentProfileController";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
+
+//authenctication middleware 
+router.use(authMiddleware);
 
 router.get("/", StudentProfileController.getAllStudentProfiles );
 router.post("/", StudentProfileController.createStudentProfile);
