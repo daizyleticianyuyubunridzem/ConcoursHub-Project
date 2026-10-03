@@ -15,6 +15,8 @@ import sessionMiddleware from './config/session';
 import AuthRoutes from './routes/authRoutes';
 import savedOpportunityRoutes from "./routes/savedOpportunityRoutes"
 import errorHandler from './middlewares/errorMiddleware';
+import eligibilityRoutes from './routes/eligibilityRoutes';
+import AppError from "./errors/AppError";
 
 
 const app = express();
@@ -41,12 +43,12 @@ app.use('/requirements', requirementRoutes);
 app.use('/users', userRoutes);
 app.use('/student-profiles', studentProfileRoutes);
 app.use('/saved-opportunities', savedOpportunityRoutes);
+app.use("/eligibility", eligibilityRoutes);
 
 //authentication routes
 app.use('/auth', AuthRoutes);
 
 app.use(errorHandler);
-
 app.get('/', (req, res) => {
     res.send("welcome to concoursHub");
 });
@@ -54,7 +56,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port: ${PORT}`)
 });
-
-
-
-

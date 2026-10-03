@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IStudentProfile extends Document {
     user: mongoose.Types.ObjectId;
     dateOfBirth?: Date;
+    background: "general" | "technical";
     academicStatus: "lower_sixth" | "upper_sixth" | "completed";
     oLevelYear?: number;
     oLevelResults?: {
@@ -40,7 +41,11 @@ const studentProfileSchema = new Schema<IStudentProfile>(
             enum: ["lower_sixth", "upper_sixth", "completed"],
             required: true,
         },
-
+        background: {
+            type: String,
+            enum: ["general", "technical"],
+            required: true,
+        },
 
           //  GCE O-Level information
         oLevelYear: {

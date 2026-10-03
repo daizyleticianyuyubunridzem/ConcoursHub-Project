@@ -14,6 +14,15 @@ class RequirementRepository {
         return await Requirement.findById(id);
     }
 
+     // Get all requirements for an application session
+    async findByApplicationSession(
+        applicationSessionId: string
+    ): Promise<IRequirement[]> {
+        return await Requirement.find({
+            applicationSession: applicationSessionId,
+        });
+    }
+
     //creat a new requirement
     async create(
         data: Partial<IRequirement>

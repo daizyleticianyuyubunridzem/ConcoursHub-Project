@@ -1,6 +1,5 @@
 import requirementRepository from "../repositories/requirementRepository";
 import { IRequirement } from "../models/requirementModel";
-
 class RequirementService {
 
     async getAllRequirements(): Promise<IRequirement[]> {
@@ -11,6 +10,12 @@ class RequirementService {
         id: string
     ): Promise<IRequirement | null> {
         return await requirementRepository.findById(id);
+    }
+
+    async getRequirementsByApplicationSession(
+    applicationSessionId: string
+    ) : Promise<IRequirement[]> {
+        return await requirementRepository.findByApplicationSession(applicationSessionId );
     }
 
     async createRequirement(

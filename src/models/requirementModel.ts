@@ -1,36 +1,40 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// TypeScript interface that defines the structure of a Requirement
 export interface IRequirement extends Document {
     applicationSession: mongoose.Types.ObjectId;
+
     type: string;
     name: string;
     description?: string;
+
+    level?: "o_level" | "a_level";
+
     subject?: string;
     minimumGrade?: string;
+
+    requiredSeries?: string;
+    requiredBackground?: "general" | "technical";
+
     minimumAge?: number;
     maximumAge?: number;
+
     isMandatory: boolean;
 }
 
-
 const requirementSchema = new Schema<IRequirement>(
     {
-        // The application session this requirement belongs to
         applicationSession: {
             type: Schema.Types.ObjectId,
             ref: "ApplicationSession",
             required: true,
         },
 
-        // Type of requirement - Example: Subject, Grade, Age, Qualification
         type: {
             type: String,
             required: true,
             trim: true,
         },
 
-        // Short name of the requirement
         name: {
             type: String,
             required: true,
@@ -42,7 +46,11 @@ const requirementSchema = new Schema<IRequirement>(
             trim: true,
         },
 
-        // Subject involved in the requirement
+        level: {
+            type: String,
+            enum: ["o_level", "a_level"],
+        },
+
         subject: {
             type: String,
             trim: true,
@@ -53,22 +61,31 @@ const requirementSchema = new Schema<IRequirement>(
             trim: true,
         },
 
+        requiredSeries: {
+            type: String,
+            trim: true,
+        },
+
+        requiredBackground: {
+            type: String,
+            enum: ["general", "technical"],
+        },
 
         minimumAge: {
             type: Number,
         },
-        
+
         maximumAge: {
             type: Number,
         },
 
         isMandatory: {
             type: Boolean,
+            required: true,
             default: true,
         },
     },
     {
-    
         timestamps: true,
     }
 );
@@ -77,6 +94,5 @@ const Requirement = mongoose.model<IRequirement>(
     "Requirement",
     requirementSchema
 );
-
 
 export default Requirement;
