@@ -1,47 +1,88 @@
 import { Request, Response, NextFunction } from "express";
+
 import SavedOpportunityService from "../services/savedOpportunityService";
+import { string } from "zod";
+
 class SavedOpportunityController {
 
-    // Get all saved opportunities
+    // Get saved opportunities belonging to the currently logged-in user
     async getAllSavedOpportunities(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> {
-        try {
-            const savedOpportunities =
-                await SavedOpportunityService.getAllSavedOpportunities();
 
-            res.status(200).json(savedOpportunities);
+        try {
+
+            const userId = req.session.userId;
+
+            if (!userId) {
+                res.status(401).json({
+                    success: false,
+                    message: "Authentication required. Please log in.",
+                });
+                return;
+            }
+
+            const savedOpportunities =
+                await SavedOpportunityService.getAllSavedOpportunities(
+                    userId
+                );
+
+            res.status(200).json({
+                success: true,
+                data: savedOpportunities,
+            });
+
         } catch (error) {
             next(error);
         }
     }
 
-    // Get one saved opportunity by ID
+
+    // Get one saved opportunity belonging to the logged-in user
     async getSavedOpportunityById(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> {
+
         try {
+
+            const userId = req.session.userId;
+
+            if (!userId) {
+                res.status(401).json({
+                    success: false,
+                    message: "Authentication required. Please log in.",
+                });
+                return;
+            }
+
             const savedOpportunity =
                 await SavedOpportunityService.getSavedOpportunityById(
+                    userId,
                     req.params.id as string
                 );
 
             if (!savedOpportunity) {
                 res.status(404).json({
-                    message: "Saved opportunity not found",
+                    success: false,
+                    message: "Saved opportunity not found.",
                 });
                 return;
             }
 
-            res.status(200).json(savedOpportunity);
+            res.status(200).json({
+                success: true,
+                data: savedOpportunity,
+            });
+
         } catch (error) {
             next(error);
         }
     }
+
 
     // Get all opportunities saved by the currently logged-in user
     async getSavedOpportunitiesByUser(
@@ -49,13 +90,14 @@ class SavedOpportunityController {
         res: Response,
         next: NextFunction
     ): Promise<void> {
+
         try {
-            // Get the user ID from the authenticated session
+
             const userId = req.session.userId;
 
-            // Make sure the user is logged in
             if (!userId) {
                 res.status(401).json({
+                    success: false,
                     message: "Authentication required. Please log in.",
                 });
                 return;
@@ -66,11 +108,16 @@ class SavedOpportunityController {
                     userId
                 );
 
-            res.status(200).json(savedOpportunities);
+            res.status(200).json({
+                success: true,
+                data: savedOpportunities,
+            });
+
         } catch (error) {
             next(error);
         }
     }
+
 
     // Save an admission opportunity for the currently logged-in user
     async saveOpportunity(
@@ -78,19 +125,19 @@ class SavedOpportunityController {
         res: Response,
         next: NextFunction
     ): Promise<void> {
+
         try {
-            // Get the logged-in user's ID from the session
+
             const userId = req.session.userId;
 
-            // Make sure the user is logged in
             if (!userId) {
                 res.status(401).json({
+                    success: false,
                     message: "Authentication required. Please log in.",
                 });
                 return;
             }
 
-            // Get only the opportunity ID from the request
             const { opportunityId } = req.body;
 
             const savedOpportunity =
@@ -99,11 +146,17 @@ class SavedOpportunityController {
                     opportunityId
                 );
 
-            res.status(201).json(savedOpportunity);
+            res.status(201).json({
+                success: true,
+                message: "Opportunity saved successfully.",
+                data: savedOpportunity,
+            });
+
         } catch (error) {
             next(error);
         }
     }
+
 
     // Remove a saved opportunity
     async removeSavedOpportunity(
@@ -111,37 +164,39 @@ class SavedOpportunityController {
         res: Response,
         next: NextFunction
     ): Promise<void> {
+
         try {
-            // Get the logged-in user's ID from the session
+
             const userId = req.session.userId;
 
-            // Make sure the user is logged in
             if (!userId) {
                 res.status(401).json({
+                    success: false,
                     message: "Authentication required. Please log in.",
                 });
                 return;
             }
 
-            // Remove the saved opportunity only if it belongs to the logged-in user
             const savedOpportunity =
                 await SavedOpportunityService.removeSavedOpportunity(
                     userId,
                     req.params.id as string
                 );
 
-            // If the saved opportunity does not exist
             if (!savedOpportunity) {
                 res.status(404).json({
-                    message: "Saved opportunity not found",
+                    success: false,
+                    message: "Saved opportunity not found.",
                 });
                 return;
             }
 
             res.status(200).json({
-                message: "Opportunity removed from saved opportunities",
-                savedOpportunity,
+                success: true,
+                message: "Opportunity removed from saved opportunities.",
+                data: savedOpportunity,
             });
+
         } catch (error) {
             next(error);
         }

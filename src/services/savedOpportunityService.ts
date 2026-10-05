@@ -5,21 +5,39 @@ import { ISavedOpportunity } from "../models/savedOpportunityModel";
 
 class SavedOpportunityService {
 
-    // Get all opportunities saved
-    async getAllSavedOpportunities(): Promise<ISavedOpportunity[]> {
-        return await savedOpportunityRepository.findAll();
+    // Get all opportunities saved by the currently logged-in user
+    async getAllSavedOpportunities(
+        userId: string
+    ): Promise<ISavedOpportunity[]> {
+
+        return await savedOpportunityRepository.findByUserId(userId);
     }
 
+    // Get one saved opportunity only if it belongs to the logged-in user
     async getSavedOpportunityById(
+        userId: string,
         id: string
     ): Promise<ISavedOpportunity | null> {
-        return await savedOpportunityRepository.findById(id);
+
+        const savedOpportunity =
+            await savedOpportunityRepository.findById(id);
+
+        if (!savedOpportunity) {
+            return null;
+        }
+
+        if (savedOpportunity.user.toString() !== userId) {
+            return null;
+        }
+
+        return savedOpportunity;
     }
 
     // Get all opportunities saved by a specific user
     async getSavedOpportunitiesByUser(
         userId: string
     ): Promise<ISavedOpportunity[]> {
+
         return await savedOpportunityRepository.findByUserId(userId);
     }
 
@@ -37,15 +55,16 @@ class SavedOpportunityService {
 
         if (existingSave) {
             throw new Error(
-                "This opportunity has already been saved"
+                "This opportunity has already been saved."
             );
         }
 
-        const userObjectId = new mongoose.Types.ObjectId(userId);
+        const userObjectId =
+            new mongoose.Types.ObjectId(userId);
+
         const opportunityObjectId =
             new mongoose.Types.ObjectId(opportunityId);
 
-        // Create the saved opportunity 
         return await savedOpportunityRepository.create({
             user: userObjectId,
             admissionOpportunity: opportunityObjectId,
@@ -53,28 +72,26 @@ class SavedOpportunityService {
     }
 
     // Remove a saved opportunity only if it belongs to the logged-in user
-async removeSavedOpportunity(
-    userId: string,
-    id: string
-): Promise<ISavedOpportunity | null> {
+    async removeSavedOpportunity(
+        userId: string,
+        id: string
+    ): Promise<ISavedOpportunity | null> {
 
-    // Find the saved opportunity first
-    const savedOpportunity =
-        await savedOpportunityRepository.findById(id);
+        const savedOpportunity =
+            await savedOpportunityRepository.findById(id);
 
-    if (!savedOpportunity) {
-        return null;
+        if (!savedOpportunity) {
+            return null;
+        }
+
+        if (savedOpportunity.user.toString() !== userId) {
+            throw new Error(
+                "You do not have permission to remove this saved opportunity."
+            );
+        }
+
+        return await savedOpportunityRepository.delete(id);
     }
-
-    // Check that the saved opportunity belongs to the logged-in user
-    if (savedOpportunity.user.toString() !== userId) {
-        throw new Error(
-            "You do not have permission to remove this saved opportunity"
-        );
-    }
-    return await savedOpportunityRepository.delete(id);
-}
 }
 
 export default new SavedOpportunityService();
-

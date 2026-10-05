@@ -1,10 +1,8 @@
-import SavedOpportunity, { ISavedOpportunity} from "../models/savedOpportunityModel";
+import SavedOpportunity, {
+    ISavedOpportunity
+} from "../models/savedOpportunityModel";
 
 class SavedOpportunityRepository {
-
-    async findAll(): Promise<ISavedOpportunity[]> {
-        return await SavedOpportunity.find();
-    }
 
     async findById(
         id: string
@@ -21,9 +19,13 @@ class SavedOpportunityRepository {
     }
 
     // Check whether a user has already saved an opportunity
-    async findByUserAndOpportunity( userId: string, opportunityId: string ): 
-    Promise<ISavedOpportunity | null> {
-        return await SavedOpportunity.findOne({ user: userId,
+    async findByUserAndOpportunity(
+        userId: string,
+        opportunityId: string
+    ): Promise<ISavedOpportunity | null> {
+
+        return await SavedOpportunity.findOne({
+            user: userId,
             admissionOpportunity: opportunityId
         });
     }
@@ -32,12 +34,14 @@ class SavedOpportunityRepository {
     async create(
         data: Partial<ISavedOpportunity>
     ): Promise<ISavedOpportunity> {
+
         return await SavedOpportunity.create(data);
     }
 
     async delete(
         id: string
     ): Promise<ISavedOpportunity | null> {
+
         return await SavedOpportunity.findByIdAndDelete(id);
     }
 }
