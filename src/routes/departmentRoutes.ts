@@ -1,21 +1,14 @@
 import { Router } from "express";
 import DepartmentController from "../controllers/departmentController";
-
+import validate from "../middlewares/validate";
+import { createDepartmentSchema, updateDepartmentSchema } from "../validators/departmentValidator";
 const router = Router();
 
-// Get all departments
+
 router.get("/", DepartmentController.getAllDepartments);
-
-// Create a new department
-router.post("/", DepartmentController.createDepartment);
-
-// Get one department by ID
+router.post("/", validate(createDepartmentSchema), DepartmentController.createDepartment);
 router.get("/:id", DepartmentController.getDepartmentById);
-
-// Update a department
-router.put("/:id", DepartmentController.updateDepartment);
-
-// Delete a department
+router.put("/:id", validate(updateDepartmentSchema), DepartmentController.updateDepartment);
 router.delete("/:id", DepartmentController.deleteDepartment);
 
 export default router;
