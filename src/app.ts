@@ -17,9 +17,11 @@ import savedOpportunityRoutes from "./routes/savedOpportunityRoutes"
 import errorHandler from './middlewares/errorMiddleware';
 import eligibilityRoutes from './routes/eligibilityRoutes';
 import AppError from "./errors/AppError";
+import helmet from 'helmet';
 
 
 const app = express();
+app.use(helmet());
 
 const PORT = process.env.PORT || 3000;
  
@@ -48,10 +50,11 @@ app.use("/eligibility", eligibilityRoutes);
 //authentication routes
 app.use('/auth', AuthRoutes);
 
-app.use(errorHandler);
 app.get('/', (req, res) => {
     res.send("welcome to concoursHub");
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port: ${PORT}`)

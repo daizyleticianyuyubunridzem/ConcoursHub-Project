@@ -22,7 +22,7 @@ const errorHandler = (
 
     res.status(500).json({
         success: false,
-        message: err.message || "Internal Server Error",
+        message: "Internal Server Error",
     });
 };
 

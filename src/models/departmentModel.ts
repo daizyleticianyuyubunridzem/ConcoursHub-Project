@@ -6,10 +6,8 @@ export interface IDepartment extends Document {
 
     // Stores the ID of the School this Department belongs to
     school: mongoose.Types.ObjectId;
-
     isActive: boolean;
 }
-
 const departmentSchema = new Schema<IDepartment>(
     {
         name: {
@@ -43,12 +41,10 @@ const departmentSchema = new Schema<IDepartment>(
         },
     },
     {
-        // Automatically adds createdAt and updatedAt
         timestamps: true,
     }
 );
 
-// Create the Department Mongoose model
 const Department = mongoose.model<IDepartment>(
     "Department",
     departmentSchema

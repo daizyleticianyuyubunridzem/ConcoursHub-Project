@@ -3,7 +3,7 @@ import MongoStore from "connect-mongo";
 
 // Configure and export the application session middleware
 const sessionMiddleware = session({
-    secret: process.env.SESSION_SECRET || "concourshub-secret",
+    secret:  process.env.SESSION_SECRET!,
 
     resave: false,
     saveUninitialized: false,
@@ -16,6 +16,8 @@ const sessionMiddleware = session({
     // Configure the browser session cookie
     cookie: {
         httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
         maxAge: 1000 * 60 * 60,
     },
 });

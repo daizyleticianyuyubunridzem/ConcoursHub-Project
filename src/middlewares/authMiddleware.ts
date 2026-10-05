@@ -9,6 +9,7 @@ const authMiddleware = (
     //chekk if current id contains user session
     if(!req.session.userId){
         res.status(401).json({
+            success: false,
             message: "Authentication required. Please log in"
         })
         return;
