@@ -14,7 +14,7 @@ const registerUserSchema = z.object({
 
     password: z
         .string()
-        .min(8, "Password must be at least 8 characters long."),
+        .min(6, "Password must be at least 6 characters long."),
 
 });
 

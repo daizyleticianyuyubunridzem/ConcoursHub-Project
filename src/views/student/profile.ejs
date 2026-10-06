@@ -1,0 +1,116 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile</title>
+</head>
+<body>
+    <header>
+        <h1>ConcoursHub</h1>
+
+        <nav>
+            <a href="/student">
+                Dashboard
+            </a>
+
+            <a href="/student/profile">
+                My Profile
+            </a>
+
+            <a href="/student/opportunities">
+                Opportunities
+            </a>
+
+            <a href="/student/eligibility">
+                Eligibility
+            </a>
+
+            <a href="/student/saved-opportunities">
+                Saved Opportunities
+            </a>
+
+            <a href="/student/account">
+                Account
+            </a>
+        </nav>
+
+    </header>
+
+    <main>
+        <h2>My Student Profile</h2>
+        <p>
+            Your profile information will be used to determine
+            which admission opportunities you may be eligible for.
+        </p>
+
+        <% if (profile) { %>
+            <section>
+                <h3>Profile Information</h3>
+                <p>
+                    <strong>Date of Birth:</strong>
+                    <%= profile.dateOfBirth %>
+                </p>
+
+                <p>
+                    <strong>Educational Background:</strong>
+                    <%= profile.background %>
+                </p>
+
+                <p>
+                    <strong>A-Level Series:</strong>
+                    <%= profile.aLevelSeries %>
+                </p>
+
+            </section>
+
+            <section>
+                <h3>Academic Results</h3>
+
+                <p>
+                    Your academic results are stored and
+                    will be use to determine which concours 
+                    you are eligible for.
+                </p>
+
+            </section>
+            <p>
+                <a href="/student/profile/edit">
+                    Edit Profile
+                </a>
+            </p>
+
+        <% } else { %>
+
+            <section>
+                <h3>Profile Not Completed</h3>
+                <p>
+                    You have not created your student profile yet.
+                </p>
+
+                <p>
+                    Complete your profile so ConcoursHub can
+                    determine which admission opportunities
+                    match your academic background.
+                </p>
+
+                <a href="/student/profile/create">
+                    Create My Profile
+                </a>
+
+            </section>
+
+        <% } %>
+
+        <p>
+            <a href="/student">
+                ← Back to Dashboard
+            </a>
+        </p>
+
+    </main>
+
+</body>
+</html>

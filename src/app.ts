@@ -18,7 +18,8 @@ import errorHandler from './middlewares/errorMiddleware';
 import eligibilityRoutes from './routes/eligibilityRoutes';
 import AppError from "./errors/AppError";
 import helmet from 'helmet';
-
+import studentDashboardRoutes from "./routes/studentDashboardRoutes";
+import studentProfileViewRoutes from "./routes/studentProfileViewRoutes";
 
 const app = express();
 app.use(helmet());
@@ -28,6 +29,7 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 //session middleware
 app.use(sessionMiddleware);
@@ -46,9 +48,15 @@ app.use('/users', userRoutes);
 app.use('/student-profiles', studentProfileRoutes);
 app.use('/saved-opportunities', savedOpportunityRoutes);
 app.use("/eligibility", eligibilityRoutes);
+import authViewRoutes from "./routes/authViewRoutes";
+
+// Student dashboard
+app.use("/student", studentDashboardRoutes);
+app.use("/student/profile", studentProfileViewRoutes);
 
 //authentication routes
 app.use('/auth', AuthRoutes);
+app.use("/", authViewRoutes);
 
 app.get('/', (req, res) => {
     res.send("welcome to concoursHub");

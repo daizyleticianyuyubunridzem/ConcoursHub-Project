@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard | ConcoursHub</title>
+</head>
+<body>
+
+    <header>
+        <h1>ConcoursHub</h1>
+
+        <nav>
+            <a href="/student">Dashboard</a>
+
+            <a href="/student/profile">
+                My Profile
+            </a>
+
+            <a href="/student/opportunities">
+                Opportunities
+            </a>
+
+            <a href="/student/eligibility">
+                Eligibility
+            </a>
+
+            <a href="/student/saved-opportunities">
+                Saved Opportunities
+            </a>
+
+            <a href="/student/account">
+                Account
+            </a>
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <h2>
+            Welcome back, <%= user.name %> 👋
+        </h2>
+
+        <p>
+            Manage your profile, discover admission opportunities,
+            and check your eligibility.
+        </p>
+
+        <section>
+            <h3>My Profile</h3>
+
+            <% if (profile) { %>
+                <p> Your student profile has been created. </p>
+                
+                <a href="/student/profile">
+                    View or update my profile
+                </a>
+
+            <% } else { %>
+
+                <p>
+                    You have not completed your student profile yet.
+                </p>
+
+                <a href="/student/profile">
+                    Create my profile
+                </a>
+
+            <% } %>
+
+        </section>
+
+        <section>
+            <h3>Quick Access</h3>
+            <ul>
+                <li>
+                    <a href="/student/opportunities">
+                        Browse Admission Opportunities
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/student/eligibility">
+                        Check Eligibility
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/student/saved-opportunities">
+                        View Saved Opportunities
+                    </a>
+                </li>
+
+            </ul>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
