@@ -1,0 +1,41 @@
+<%- include('head', { title }) %><%- include('admin-nav', { active }) %>
+<main class="container-fluid app-container page-shell">
+  <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+    <div>
+      <p class="eyebrow mb-2">CONCOURS HUB · ADMIN</p>
+      <h1 class="page-title mb-2"><%= title %></h1>
+      <p class="page-lede mb-0"><%= description %></p>
+    </div>
+    <span class="status-pill"><%= rows.length %> records</span>
+
+  </div>
+  <% if(fields.length) { %>
+    <section class="panel admin-form-panel p-3 p-lg-4 mb-4">
+      <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+        <div>
+          <h2 class="panel-heading h5 mb-1" data-form-heading>Add a record</h2>
+          <p class="small text-secondary mb-0">Keep entries accurate and use official published details.</p>
+        </div>
+        <button class="btn btn-sm btn-link" type="button" data-form-reset hidden>Cancel edit</button>
+      </div>
+    <form data-admin-form data-endpoint="<%= endpoint %>" class="row g-3">
+      <% fields.forEach((field) => { %>
+        <div class="col-md-<%= field.type === 'textarea' ? '12' : field.type === 'checkbox' ? '12' : '6' %>">
+        <% if(field.type === 'checkbox') { %>
+          <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" name="<%= field.name %>" id="field-<%= field.name %>" <%= field.defaultValue === 'true' ? 'checked' : '' %>>
+            <label class="form-check-label form-label" for="field-<%= field.name %>"><%= field.label %></label></div>
+        <% } else if(field.type === 'textarea') { %><label class="form-label" for="field-<%= field.name %>"><%= field.label %></label><textarea class="form-control" id="field-<%= field.name %>" name="<%= field.name %>" rows="2" <%= field.required ? 'required' : '' %>></textarea>
+        <% } else if(field.type === 'select') { %><label class="form-label" for="field-<%= field.name %>"><%= field.label %></label><select class="form-select" id="field-<%= field.name %>" name="<%= field.name %>" <%= field.multiple ? 'multiple' : '' %> <%= field.required ? 'required' : '' %>><% if(!field.multiple) { %><option value="">Choose…</option><% } %><% field.options.forEach((option) => { %><option value="<%= option.value %>"><%= option.label %></option><% }) %></select>
+        <% } else { %><label class="form-label" for="field-<%= field.name %>"><%= field.label %></label><input class="form-control" id="field-<%= field.name %>" name="<%= field.name %>" type="<%= field.type || 'text' %>" <%= field.required ? 'required' : '' %> <%= field.type === 'number' ? 'min="1" step="1"' : '' %>> <% } %>
+      </div><% }) %>
+      <div class="col-12 d-flex align-items-center gap-3"><button class="btn btn-forest" type="submit" data-submit-label>Add record</button><span class="small text-secondary" data-form-status aria-live="polite"></span></div>
+    </form>
+  </section><% } %>
+  <section class="panel p-3 p-lg-4"><div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3"><h2 class="panel-heading h5 mb-0">All <%= title.toLowerCase() %></h2><input class="form-control admin-search" type="search" placeholder="Search this list" aria-label="Search records" data-admin-search></div><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><% columns.forEach((column) => { %><th scope="col"><%= column === 'academicYear' ? 'Academic year' : column === 'isPublished' ? 'Publication' : column === 'createdAt' ? 'Joined' : column.replace(/([A-Z])/g,' $1') %></th><% }) %><% if(fields.length) { %><th scope="col" class="text-end">Actions</th><% } %></tr></thead><tbody>
+    <% rows.forEach((record) => { %><tr data-admin-row data-record-id="<%= record.id %>"><% columns.forEach((column) => { %><td><%= record.cells[column] || record.cells[column.replace(/([A-Z])/g,' $1').trim()] || '—' %></td><% }) %><% if(fields.length) { %><td class="text-end text-nowrap"><button class="btn btn-sm btn-outline-forest" type="button" data-edit-record="<%= JSON.stringify(record.record) %>">Edit</button><button class="btn btn-sm btn-link text-danger" type="button" data-delete-record="<%= record.id %>">Remove</button></td><% } %></tr><% }) %>
+    <% if(!rows.length) { %><tr><td colspan="<%= columns.length + (fields.length ? 1 : 0) %>" class="text-center py-5"><span class="feature-icon mx-auto">＋</span><p class="panel-heading h5 mt-3">No records yet</p><p class="small text-secondary mb-0">Use the form above to add the first one.</p></td></tr><% } %>
+  </tbody></table></div></section>
+  <% if(page === 'sessions') { %><p class="small text-secondary mt-3">Only publish a session after confirming dates and requirements from the official institution source.</p><% } %>
+</main>
+<script src="/js/admin-ui.js" defer></script><%- include('footer') %>

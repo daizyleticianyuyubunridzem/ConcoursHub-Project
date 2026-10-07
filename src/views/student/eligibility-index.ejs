@@ -1,0 +1,17 @@
+<%- include('../partials/head', { title: 'Eligibility guidance' }) %><%- include('../partials/student-nav', { active: 'eligibility' }) %>
+<main class="container app-container page-shell">
+  <p class="eyebrow">COMPARE, THEN CONFIRM</p>
+  <h1 class="page-title">Eligibility guidance</h1>
+  <p class="page-lede">Choose a published concours to compare its recorded requirements with your academic profile.</p>
+
+  <% if(!hasProfile) { %>
+    <div class="notice-callout my-4">Create your academic profile first to compare requirements against your results.
+       <a href="/student/profile/create" class="fw-semibold">Set up profile →</a>
+      </div>
+  <% } %>
+  <% if(listings.length) { %>
+    <div class="row g-3 mt-2"><% listings.forEach((session) => {
+      const opportunity=session.admissionOpportunity; const institution=opportunity.programmes?.[0]?.department?.school?.institution; %>
+      <div class="col-lg-6"><article class="panel opportunity-card"><p class="eyebrow"><%= institution?.name || 'Institution not specified' %></p><h2 class="panel-heading h5 mt-2"><%= opportunity.name %></h2><p class="small text-secondary"><%= opportunity.type %> · <%= session.academicYear %></p><a class="btn btn-sm btn-forest" href="/student/eligibility/<%= session._id %>"><%= hasProfile ? 'Compare requirements' : 'Create profile to compare' %></a><a class="btn btn-sm btn-outline-forest ms-1" href="/student/opportunities/<%= session._id %>">View details</a></article></div><% }) %></div><% } else { %><section class="panel empty-state mt-4"><span class="feature-icon mx-auto">✓</span><h2 class="panel-heading h4 mt-3">No published sessions yet</h2><p>Eligibility guidance will be available when concours and their requirements are published.</p><a href="/student/opportunities" class="btn btn-forest">Browse concours</a></section><% } %>
+  <div class="notice-callout mt-4">ConcoursHub’s comparison is guidance based on published information and the profile details you provide. The institution makes all official eligibility decisions.</div>
+</main><%- include('../partials/footer') %>

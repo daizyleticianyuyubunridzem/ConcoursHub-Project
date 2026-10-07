@@ -1,0 +1,13 @@
+<%- include('../partials/head', { title: 'Create account' }) %>
+<%- include('../partials/public-nav') %>
+<main class="auth-page"><section class="panel auth-card">
+  <p class="eyebrow mb-2">YOUR PREPARATION STARTS HERE</p><h1>Create your account.</h1><p class="text-secondary">Save useful information and shape a study plan at your own pace.</p>
+  <% if (typeof error !== 'undefined' && error) { %><div class="alert alert-danger py-2 small" role="alert"><%= error %></div><% } %>
+  <form action="/register" method="post" class="mt-4">
+    <div class="mb-3"><label class="form-label" for="name">Full name</label><input class="form-control" id="name" name="name" value="<%= typeof values !== 'undefined' && values ? values.name : '' %>" autocomplete="name" required minlength="2"></div>
+    <div class="mb-3"><label class="form-label" for="email">Email address</label><input class="form-control" id="email" name="email" type="email" value="<%= typeof values !== 'undefined' && values ? values.email : '' %>" autocomplete="email" required></div>
+    <div class="mb-3"><label class="form-label" for="password">Password</label><input class="form-control" id="password" name="password" type="password" autocomplete="new-password" required minlength="6"><div class="form-text">Use at least 6 characters.</div></div>
+    <button class="btn btn-forest w-100 mt-2" type="submit">Create account</button>
+  </form><p class="small text-center mt-4 mb-0">Already have an account? <a href="/login">Sign in</a></p>
+</section></main>
+<%- include('../partials/footer') %>

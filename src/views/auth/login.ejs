@@ -1,67 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | ConcoursHub</title>
-</head>
-<body>
-    <header>
-        <h1>ConcoursHub</h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/login">Login</a>
-            <a href="/register">Register</a>
-        </nav>
-    </header>
-    <main>
-        <h2>Login</h2>
-        <p>
-            Login to your ConcoursHub student account.
-        </p>
-
-        <form action="/login" method="POST">
-            <div>
-                <label for="email">
-                    Email
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                >
-            </div>
-
-            <div>
-                <label for="password">
-                    Password
-                </label>
-
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    required
-                >
-            </div>
-
-            <button type="submit">
-                Login
-            </button>
-
-        </form>
-
-        <p>
-            Don't have an account?
-            <a href="/register">
-                Create an account
-            </a>
-        </p>
-
-    </main>
-
-</body>
-</html>
-
+<%- include('../partials/head', { title: 'Sign in' }) %>
+<%- include('../partials/public-nav') %>
+<main class="auth-page"><section class="panel auth-card">
+  <p class="eyebrow mb-2">WELCOME BACK</p><h1>Pick up where you left off.</h1><p class="text-secondary">Sign in to review your saved concours and study plan.</p>
+  <% if (typeof error !== 'undefined' && error) { %><div class="alert alert-danger py-2 small" role="alert"><%= error %></div><% } %>
+  <form action="/login" method="post" class="mt-4">
+    <div class="mb-3"><label class="form-label" for="email">Email address</label><input class="form-control" id="email" name="email" type="email" autocomplete="email" required></div>
+    <div class="mb-3"><label class="form-label" for="password">Password</label><input class="form-control" id="password" name="password" type="password" autocomplete="current-password" required></div>
+    <button class="btn btn-forest w-100 mt-2" type="submit">Sign in</button>
+  </form><p class="small text-center mt-4 mb-0">New to ConcoursHub? <a href="/register">Create an account</a></p>
+</section></main>
+<%- include('../partials/footer') %>

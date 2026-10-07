@@ -2,6 +2,7 @@ import express from 'express';
 import "./config/env";
 import connectDB from './config/db';
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 import InstitutionRoutes from "./routes/institutionRoutes";
 import SchoolRoutes from "./routes/schoolRoutes";
 import DepartmentRoutes from "./routes/departmentRoutes";
@@ -20,6 +21,9 @@ import AppError from "./errors/AppError";
 import helmet from 'helmet';
 import studentDashboardRoutes from "./routes/studentDashboardRoutes";
 import studentProfileViewRoutes from "./routes/studentProfileViewRoutes";
+import studentOpportunityViewRoutes from "./routes/studentOpportunityViewRoutes";
+import adminViewRoutes from "./routes/adminViewRoutes";
+import publicExploreRoutes from "./routes/publicExploreRoutes";
 
 const app = express();
 app.use(helmet());
@@ -30,12 +34,14 @@ connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.resolve(__dirname, "../public")));
 
 //session middleware
 app.use(sessionMiddleware);
 
 app.set ('view engine', 'ejs');
-app.set("views", path.join(__dirname, "views"));
+const compiledViews = path.join(__dirname, "views");
+app.set("views", existsSync(compiledViews) ? compiledViews : path.resolve(__dirname, "../src/views"));
 
 app.use('/institutions', InstitutionRoutes);
 app.use('/schools', SchoolRoutes);
@@ -48,19 +54,18 @@ app.use('/users', userRoutes);
 app.use('/student-profiles', studentProfileRoutes);
 app.use('/saved-opportunities', savedOpportunityRoutes);
 app.use("/eligibility", eligibilityRoutes);
+app.use("/explore", publicExploreRoutes);
 import authViewRoutes from "./routes/authViewRoutes";
 
 // Student dashboard
 app.use("/student", studentDashboardRoutes);
 app.use("/student/profile", studentProfileViewRoutes);
+app.use("/student", studentOpportunityViewRoutes);
+app.use("/admin", adminViewRoutes);
 
 //authentication routes
 app.use('/auth', AuthRoutes);
 app.use("/", authViewRoutes);
-
-app.get('/', (req, res) => {
-    res.send("welcome to concoursHub");
-});
 
 app.use(errorHandler);
 

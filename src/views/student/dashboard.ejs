@@ -1,104 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Student Dashboard | ConcoursHub</title>
-</head>
-<body>
-
-    <header>
-        <h1>ConcoursHub</h1>
-
-        <nav>
-            <a href="/student">Dashboard</a>
-
-            <a href="/student/profile">
-                My Profile
-            </a>
-
-            <a href="/student/opportunities">
-                Opportunities
-            </a>
-
-            <a href="/student/eligibility">
-                Eligibility
-            </a>
-
-            <a href="/student/saved-opportunities">
-                Saved Opportunities
-            </a>
-
-            <a href="/student/account">
-                Account
-            </a>
-        </nav>
-
-    </header>
-
-
-    <main>
-
-        <h2>
-            Welcome back, <%= user.name %> 👋
-        </h2>
-
-        <p>
-            Manage your profile, discover admission opportunities,
-            and check your eligibility.
-        </p>
-
-        <section>
-            <h3>My Profile</h3>
-
-            <% if (profile) { %>
-                <p> Your student profile has been created. </p>
-                
-                <a href="/student/profile">
-                    View or update my profile
-                </a>
-
-            <% } else { %>
-
-                <p>
-                    You have not completed your student profile yet.
-                </p>
-
-                <a href="/student/profile">
-                    Create my profile
-                </a>
-
-            <% } %>
-
-        </section>
-
-        <section>
-            <h3>Quick Access</h3>
-            <ul>
-                <li>
-                    <a href="/student/opportunities">
-                        Browse Admission Opportunities
-                    </a>
-                </li>
-
-                <li>
-                    <a href="/student/eligibility">
-                        Check Eligibility
-                    </a>
-                </li>
-
-                <li>
-                    <a href="/student/saved-opportunities">
-                        View Saved Opportunities
-                    </a>
-                </li>
-
-            </ul>
-
-        </section>
-
-    </main>
-
-</body>
-</html>
+<%- include('../partials/head', { title: 'My dashboard' }) %>
+<%- include('../partials/student-nav', { active: 'dashboard' }) %>
+<main class="container app-container page-shell">
+  <p class="eyebrow">YOUR STUDY SPACE</p><h1 class="page-title">Welcome back, <%= user.name.split(' ')[0] %>.</h1><p class="page-lede">A steady plan is a strong start. Find the information you need and keep your next steps in view.</p>
+  <% if (!profile) { %><section class="panel p-4 p-lg-5 my-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3"><div><span class="status-pill">ONE QUICK FIRST STEP</span><h2 class="panel-heading h3 mt-3">Add your academic profile</h2><p class="text-secondary mb-0">Your profile helps compare your results with documented requirements. You can browse concours without it.</p></div><a href="/student/profile/create" class="btn btn-forest flex-shrink-0">Complete my profile <span aria-hidden="true">→</span></a></section><% } else { %><section class="notice-callout my-4"><strong>Your profile is ready.</strong> Use it to compare your academic details with published requirements. Results are guidance only.</section><% } %>
+  <div class="row g-3 mt-2">
+    <div class="col-md-6"><a class="panel quick-link d-block p-4 h-100 text-decoration-none" href="/student/opportunities"><span class="feature-icon">⌕</span><h2 class="panel-heading h4 mt-3">Find a concours</h2><p class="text-secondary mb-3">Explore published information, key dates and official sources.</p><span class="text-forest fw-semibold small">Browse listings →</span></a></div>
+    <div class="col-md-6"><a class="panel quick-link d-block p-4 h-100 text-decoration-none" href="/student/saved-opportunities"><span class="feature-icon">☆</span><h2 class="panel-heading h4 mt-3">Your saved list</h2><p class="text-secondary mb-3">Keep the opportunities you’re considering together.</p><span class="text-forest fw-semibold small">View saved →</span></a></div>
+    <div class="col-md-6"><a class="panel quick-link d-block p-4 h-100 text-decoration-none" href="/student/profile"><span class="feature-icon">◎</span><h2 class="panel-heading h4 mt-3">Academic profile</h2><p class="text-secondary mb-3">Keep your background and results up to date.</p><span class="text-forest fw-semibold small">View profile →</span></a></div>
+    <div class="col-md-6"><div class="panel p-4 h-100"><span class="feature-icon">✦</span><h2 class="panel-heading h4 mt-3">Study rhythm</h2><p class="text-secondary mb-0">Set a manageable weekly goal and focus on one session at a time. Small, regular study sessions add up.</p></div></div>
+  </div>
+  <div class="notice-callout mt-4"><strong>Applications:</strong> ConcoursHub does not accept or process applications. Follow the official institution source for application instructions and decisions.</div>
+</main>
+<%- include('../partials/footer') %>
