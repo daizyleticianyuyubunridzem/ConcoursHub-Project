@@ -13,6 +13,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  document.querySelectorAll("[data-toggle-publish]").forEach((button) => button.addEventListener("click", async () => {
+    const isPublished = button.dataset.published === "true";
+    const action = isPublished ? "unpublish" : "publish";
+    if (!window.confirm(`Are you sure you want to ${action} this session?`)) return;
+
+    button.disabled = true;
+    try {
+      const response = await fetch(`/application-sessions/${encodeURIComponent(button.dataset.togglePublish)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ isPublished: !isPublished }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.errors?.map((issue) => issue.message).join(" ") || result.message || `Could not ${action} this session.`);
+      window.location.reload();
+    } catch (error) {
+      const status = document.querySelector("[data-form-status]");
+      if (status) status.textContent = error instanceof Error ? error.message : `Could not ${action} this session.`;
+      button.disabled = false;
+    }
+  }));
+
   const form = document.querySelector("[data-admin-form]");
   if (!form) return;
   const endpoint = form.dataset.endpoint;

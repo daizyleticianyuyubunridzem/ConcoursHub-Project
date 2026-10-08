@@ -11,7 +11,7 @@ import StudentProfile from "../models/studentProfileModel";
 import UserService from "../services/userService";
 import { updateAdminAccountSchema } from "../validators/userValidator";
 
-type Field = { name: string; label: string; type?: string; required?: boolean; multiple?: boolean; defaultValue?: string; options?: { value: string; label: string }[] };
+type Field = { name: string; label: string; type?: string; required?: boolean; multiple?: boolean; defaultValue?: string; selectedValue?: string; options?: { value: string; label: string }[] };
 type Row = { id: string; cells: Record<string, string>; record: Record<string, unknown> };
 const choice = (items: any[], name = "name") => items.map((item) => ({ value: item._id.toString(), label: item[name] }));
 const refId = (value: any) => value && typeof value === "object" ? value._id?.toString() || "" : value?.toString?.() || "";
@@ -72,7 +72,7 @@ class AdminViewController {
                 opportunities: { title: "Concours", description: "Add concours information and connect it to one or more programmes.", endpoint: "/admission-opportunities", fields: [
                     { name: "name", label: "Concours name", required: true }, { name: "type", label: "Category", required: true }, { name: "programmes", label: "Programmes", type: "select", multiple: true, options: refOptions.programmes }, { name: "officialSource", label: "Official information URL", type: "url" }, { name: "description", label: "Description", type: "textarea" }, { name: "isActive", label: "Active", type: "checkbox", defaultValue: "true" },
                 ], columns: ["name", "type", "programmes", "officialSource"], rows: opportunities.map((x: any) => row(x, { name: x.name, type: x.type, programmes: x.programmes?.map((p: any) => p.name).join(", "), officialSource: x.officialSource }, { name: x.name, type: x.type, programmes: x.programmes?.map((p: any) => refId(p)) || [], officialSource: x.officialSource, description: x.description, isActive: x.isActive })) },
-                sessions: { title: "Application sessions", description: "Record dates and official application links. Publish only after details are verified.", endpoint: "/application-sessions", fields: [
+                sessions: { title: "Concours publishing", description: "Record dates and official application links, then publish verified sessions to student listings.", endpoint: "/application-sessions", fields: [
                     { name: "admissionOpportunity", label: "Concours", type: "select", options: refOptions.opportunities, required: true }, { name: "academicYear", label: "Academic year", required: true }, { name: "status", label: "Status", required: true, defaultValue: "Upcoming" }, { name: "applicationStartDate", label: "Applications open", type: "date" }, { name: "applicationDeadline", label: "Deadline", type: "date" }, { name: "examinationDate", label: "Examination date", type: "date" }, { name: "officialApplicationUrl", label: "Official application page", type: "url" }, { name: "lastVerifiedAt", label: "Last verified", type: "date" }, { name: "isPublished", label: "Published to students", type: "checkbox" },
                 ], columns: ["opportunity", "academicYear", "status", "applicationDeadline", "isPublished"], rows: sessions.map((x: any) => row(x, { opportunity: x.admissionOpportunity?.name, academicYear: x.academicYear, status: x.status, applicationDeadline: dateInput(x.applicationDeadline), isPublished: x.isPublished ? "Published" : "Draft" }, { admissionOpportunity: refId(x.admissionOpportunity), academicYear: x.academicYear, status: x.status, applicationStartDate: dateInput(x.applicationStartDate), applicationDeadline: dateInput(x.applicationDeadline), examinationDate: dateInput(x.examinationDate), officialApplicationUrl: x.officialApplicationUrl, lastVerifiedAt: dateInput(x.lastVerifiedAt), isPublished: x.isPublished })) },
                 requirements: { title: "Requirements", description: "Capture the exact published requirements for an application session.", endpoint: "/requirements", fields: [
@@ -81,6 +81,13 @@ class AdminViewController {
             };
             const config = configs[page];
             if (!config) { res.status(404).render("errors/404"); return; }
+            if (page === "sessions") {
+                const selectedOpportunityId = String(req.query.opportunity || "");
+                const opportunityField = config.fields.find((field) => field.name === "admissionOpportunity");
+                if (opportunityField?.options?.some((option) => option.value === selectedOpportunityId)) {
+                    opportunityField.selectedValue = selectedOpportunityId;
+                }
+            }
             res.render(`admin/${page === "sessions" ? "application-sessions" : page}`, { active: page, page, ...config });
         } catch (error) { next(error); }
     }
