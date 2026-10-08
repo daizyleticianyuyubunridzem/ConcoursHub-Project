@@ -7,6 +7,8 @@ export interface IUser extends Document {
     password: string;
     role: "student" | "admin";
     isActive: boolean;
+    passwordResetTokenHash?: string;
+    passwordResetExpiresAt?: Date;
 }
 
 const userSchema = new Schema<IUser>(
@@ -41,6 +43,9 @@ const userSchema = new Schema<IUser>(
             type: Boolean,
             default: true,
         },
+
+        passwordResetTokenHash: { type: String, select: false },
+        passwordResetExpiresAt: { type: Date, select: false },
     },
     {
         timestamps: true,

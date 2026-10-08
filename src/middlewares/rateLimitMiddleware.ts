@@ -13,3 +13,11 @@ const authRateLimiter = rateLimit({
 });
 
 export default authRateLimiter;
+
+export const passwordResetRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: "Too many password reset attempts. Please try again later.",
+});

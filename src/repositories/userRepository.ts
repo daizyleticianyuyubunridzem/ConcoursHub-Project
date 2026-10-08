@@ -17,6 +17,27 @@ class UserRepository {
         return await User.findOne({ email: email.trim().toLowerCase() });
     }
 
+    async findByPasswordResetTokenHash(tokenHash: string): Promise<IUser | null> {
+        return User.findOne({
+            passwordResetTokenHash: tokenHash,
+            passwordResetExpiresAt: { $gt: new Date() },
+            isActive: true,
+        }).select("+passwordResetTokenHash +passwordResetExpiresAt");
+    }
+
+    async setPasswordResetToken(userId: string, tokenHash: string, expiresAt: Date): Promise<void> {
+        await User.findByIdAndUpdate(userId, {
+            $set: { passwordResetTokenHash: tokenHash, passwordResetExpiresAt: expiresAt },
+        });
+    }
+
+    async updatePasswordAndClearResetToken(userId: string, password: string): Promise<void> {
+        await User.findByIdAndUpdate(userId, {
+            $set: { password },
+            $unset: { passwordResetTokenHash: 1, passwordResetExpiresAt: 1 },
+        });
+    }
+
     // Create a new user
     async create( data: Partial<IUser> ): Promise<IUser> {
         return await User.create(data);

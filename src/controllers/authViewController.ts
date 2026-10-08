@@ -1,12 +1,99 @@
 import { Request, Response, NextFunction } from "express";
 
 import AuthService from "../services/authService";
-import { createUserSchema, loginUserSchema } from "../validators/userValidator";
+import userRepository from "../repositories/userRepository";
+import EmailService from "../services/emailService";
+import bcrypt from "bcrypt";
+import { createHash, randomBytes } from "node:crypto";
+import { createUserSchema, loginUserSchema, passwordResetRequestSchema, passwordResetSchema } from "../validators/userValidator";
 
 class AuthViewController {
 
-    showHome(req: Request, res: Response): void { res.render("public/home"); }
+    showForgotPassword(req: Request, res: Response): void {
+        res.render("auth/forgot-password");
+    }
 
+    async requestPasswordReset(req: Request, res: Response): Promise<void> {
+        const parsed = passwordResetRequestSchema.safeParse(req.body);
+        if (!parsed.success) {
+            res.status(400).render("auth/forgot-password", { error: parsed.error.issues[0]?.message, email: req.body.email });
+            return;
+        }
+
+        try {
+            const baseUrl = process.env.APP_BASE_URL?.replace(/\/$/, "");
+            if (!baseUrl) throw new Error("APP_BASE_URL is not configured.");
+
+            // Check SMTP configuration before looking up the email so unavailable
+            if (!process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER || !process.env.SMTP_PASSWORD || !process.env.SMTP_FROM) {
+                throw new Error("SMTP is not configured.");
+            }
+
+            const user = await userRepository.findByEmail(parsed.data.email);
+            if (user?.isActive && user.role === "student") {
+                const token = randomBytes(32).toString("hex");
+                const tokenHash = createHash("sha256").update(token).digest("hex");
+                await userRepository.setPasswordResetToken(user._id.toString(), tokenHash, new Date(Date.now() + 30 * 60 * 1000));
+                try {
+                    await EmailService.sendPasswordReset(user.email, `${baseUrl}/reset-password/${token}`);
+                } catch (error) {
+                    // Keep the response identical for known and unknown emails.
+                    console.error("Password reset email delivery failed:", error);
+                }
+            }
+
+            res.render("auth/forgot-password", {
+                success: "If an active student account uses that email, a password reset link will arrive shortly.",
+            });
+        } catch (error) {
+            console.error("Password reset email could not be sent:", error);
+            res.status(503).render("auth/forgot-password", {
+                error: "Password reset is temporarily unavailable. Please try again later or contact support.",
+                email: parsed.data.email,
+            });
+        }
+    }
+
+    async showResetPassword(req: Request, res: Response): Promise<void> {
+        const token = String(req.params.token);
+        const tokenHash = createHash("sha256").update(token).digest("hex");
+        try {
+            const user = await userRepository.findByPasswordResetTokenHash(tokenHash);
+            if (!user) {
+                res.status(400).render("auth/reset-password", { error: "This reset link is invalid or has expired. Request a new one.", invalid: true });
+                return;
+            }
+            res.render("auth/reset-password", { token });
+        } catch (error) {
+            console.error("Password reset link could not be checked:", error);
+            res.status(503).render("auth/reset-password", { error: "We couldn't verify this link right now. Please try again later.", invalid: true });
+        }
+    }
+
+    async resetPassword(req: Request, res: Response): Promise<void> {
+        const parsed = passwordResetSchema.safeParse(req.body);
+        const token = String(req.params.token);
+        if (!parsed.success) {
+            res.status(400).render("auth/reset-password", { error: parsed.error.issues[0]?.message, token });
+            return;
+        }
+        try {
+            const tokenHash = createHash("sha256").update(token).digest("hex");
+            const user = await userRepository.findByPasswordResetTokenHash(tokenHash);
+            if (!user) {
+                res.status(400).render("auth/reset-password", { error: "This reset link is invalid or has expired. Request a new one.", invalid: true });
+                return;
+            }
+            const hashedPassword = await bcrypt.hash(parsed.data.password, 10);
+            await userRepository.updatePasswordAndClearResetToken(user._id.toString(), hashedPassword);
+            res.render("auth/login", { success: "Your password has been updated. You can now sign in." });
+        } catch (error) {
+            console.error("Password could not be reset:", error);
+            res.status(503).render("auth/reset-password", { error: "We couldn't update your password right now. Please try again later.", token });
+        }
+    }
+
+    showHome(req: Request, res: Response): void { res.render("public/home"); }
     showRegister(req: Request, res: Response): void { res.render("auth/register"); }
 
     // Display the browser login page

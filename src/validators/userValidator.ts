@@ -33,6 +33,18 @@ export const loginUserSchema = z.object({
 
 });
 
+export const passwordResetRequestSchema = z.object({
+    email: z.string().trim().email("Please provide a valid email address."),
+});
+
+export const passwordResetSchema = z.object({
+    password: z.string().min(6, "Password must be at least 6 characters long."),
+    confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "The passwords do not match.",
+    path: ["confirmPassword"],
+});
+
 export const updateUserStatusSchema = z.object({
     isActive: z.boolean(),
 });
