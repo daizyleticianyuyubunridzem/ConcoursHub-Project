@@ -1,13 +1,51 @@
-<%- include('../partials/head', { title: 'Create your profile' }) %>
+<%- include('../partials/head', { title: isEdit ? 'Edit your profile' : 'Create your profile' }) %>
 <%- include('../partials/student-nav', { active: 'profile' }) %>
 <main class="container app-container page-shell">
-  <p class="eyebrow">A LITTLE CONTEXT GOES A LONG WAY</p><h1 class="page-title">Build your academic profile</h1><p class="page-lede">Add the details you want to use for a documented requirements comparison. This is private to your account and can be skipped for now.</p>
-  <form id="studentProfileForm" action="/student/profile/create" method="post" class="mt-4">
-    <section class="form-section"><h2 class="form-section-title">Your background</h2><div class="row g-3"><div class="col-md-6"><label class="form-label" for="dateOfBirth">Date of birth <span class="text-secondary fw-normal">(optional)</span></label><input class="form-control" id="dateOfBirth" name="dateOfBirth" type="date"></div><div class="col-md-6"><label class="form-label" for="academicStatus">Academic status</label><select class="form-select" id="academicStatus" name="academicStatus" required><option value="">Choose your current status</option><option value="lower_sixth">Lower Sixth</option><option value="upper_sixth">Upper Sixth</option><option value="completed">Completed A-Level</option></select></div><div class="col-md-6"><label class="form-label" for="background">Educational background</label><select class="form-select" id="background" name="background" required><option value="">Choose a background</option><option value="general">General</option><option value="technical">Technical</option></select></div></div></section>
-    <section class="form-section"><h2 class="form-section-title">GCE O-Level</h2><div class="row g-3 align-items-end"><div class="col-md-4"><label for="oLevelYear" class="form-label">Year completed</label><input class="form-control" type="number" id="oLevelYear" name="oLevelYear" min="1900" max="2100"></div><div class="col-md-4"><label for="oLevelSubject" class="form-label">Subject</label><input class="form-control" id="oLevelSubject" placeholder="e.g. Mathematics"></div><div class="col-md-3"><label for="oLevelGrade" class="form-label">Grade</label><input class="form-control" id="oLevelGrade" placeholder="e.g. A" maxlength="3"></div><div class="col-md-1"><button class="btn btn-outline-forest w-100" type="button" id="addOLevel" aria-label="Add O-Level result">+</button></div></div><div id="oLevelResultList" class="mt-2" aria-live="polite"></div></section>
-    <section class="form-section"><h2 class="form-section-title">GCE A-Level</h2><div class="row g-3"><div class="col-md-4"><label for="aLevelYear" class="form-label">Year completed</label><input class="form-control" type="number" id="aLevelYear" name="aLevelYear" min="1900" max="2100"></div><div class="col-md-4"><label for="aLevelSeries" class="form-label">A-Level series</label><input class="form-control" id="aLevelSeries" name="aLevelSeries" placeholder="e.g. S1"></div></div><div class="row g-3 align-items-end mt-1"><div class="col-md-5"><label for="aLevelSubject" class="form-label">Subject</label><input class="form-control" id="aLevelSubject" placeholder="e.g. Biology"></div><div class="col-md-5"><label for="aLevelGrade" class="form-label">Grade</label><input class="form-control" id="aLevelGrade" placeholder="e.g. B" maxlength="3"></div><div class="col-md-2"><button class="btn btn-outline-forest w-100" type="button" id="addALevel">Add result</button></div></div><div id="aLevelResultList" class="mt-2" aria-live="polite"></div></section>
-    <section class="form-section"><h2 class="form-section-title">Other qualification <span class="text-secondary fw-normal small">(optional)</span></h2><div class="row g-3"><div class="col-md-5"><label for="qualificationName" class="form-label">Qualification name</label><input class="form-control" id="qualificationName" name="qualificationName" placeholder="e.g. IT certificate"></div><div class="col-md-3"><label for="qualificationYear" class="form-label">Year</label><input class="form-control" type="number" id="qualificationYear" name="qualificationYear" min="1900" max="2100"></div><div class="col-md-12"><label for="qualificationDetails" class="form-label">Details</label><textarea class="form-control" id="qualificationDetails" name="qualificationDetails" rows="2"></textarea></div></div></section>
-    <div class="d-flex flex-wrap gap-2 mt-4"><button type="submit" class="btn btn-forest px-4">Save profile</button><a class="btn btn-outline-forest px-4" href="/student">Do this later</a></div>
+  <p class="eyebrow"><%= isEdit ? 'KEEP YOUR DETAILS UP TO DATE' : 'A LITTLE CONTEXT GOES A LONG WAY' %></p>
+  <h1 class="page-title"><%= isEdit ? 'Edit your academic profile' : 'Build your academic profile' %></h1>
+  <p class="page-lede"><%= isEdit ? 'Update your academic background and results. Your profile remains private to your account.' : 'Add the details you want to use for a documented requirements comparison. This is private to your account and can be skipped for now.' %></p>
+  <form id="studentProfileForm" action="/student/profile/<%= isEdit ? 'edit' : 'create' %>" method="post" class="mt-4" data-initial-o-level="<%= JSON.stringify(profile?.oLevelResults || []) %>" data-initial-a-level="<%= JSON.stringify(profile?.aLevelResults || []) %>">
+    <section class="form-section">
+      <h2 class="form-section-title">Your background</h2>
+      <div class="row g-3">
+        <div class="col-md-6"><label class="form-label" for="dateOfBirth">Date of birth <span class="text-secondary fw-normal">(optional)</span></label><input class="form-control" id="dateOfBirth" name="dateOfBirth" type="date" value="<%= profile?.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().slice(0, 10) : '' %>"></div>
+        <div class="col-md-6"><label class="form-label" for="academicStatus">Academic status</label><select class="form-select" id="academicStatus" name="academicStatus" required><option value="">Choose your current status</option><option value="lower_sixth" <%= profile?.academicStatus === 'lower_sixth' ? 'selected' : '' %>>Lower Sixth</option><option value="upper_sixth" <%= profile?.academicStatus === 'upper_sixth' ? 'selected' : '' %>>Upper Sixth</option><option value="completed" <%= profile?.academicStatus === 'completed' ? 'selected' : '' %>>Completed A-Level</option></select></div>
+        <div class="col-md-6"><label class="form-label" for="background">Educational background</label><select class="form-select" id="background" name="background" required><option value="">Choose a background</option><option value="general" <%= profile?.background === 'general' ? 'selected' : '' %>>General</option><option value="technical" <%= profile?.background === 'technical' ? 'selected' : '' %>>Technical</option></select></div>
+      </div>
+    </section>
+    <section class="form-section">
+      <h2 class="form-section-title">GCE O-Level</h2>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4"><label for="oLevelYear" class="form-label">Year completed</label><input class="form-control" type="number" id="oLevelYear" name="oLevelYear" min="1900" max="2100" value="<%= profile?.oLevelYear || '' %>"></div>
+        <div class="col-md-4"><label for="oLevelSubject" class="form-label">Subject</label><input class="form-control" id="oLevelSubject" placeholder="e.g. Mathematics"></div>
+        <div class="col-md-3"><label for="oLevelGrade" class="form-label">Grade</label><input class="form-control" id="oLevelGrade" placeholder="e.g. A" maxlength="3"></div>
+        <div class="col-md-1"><button class="btn btn-outline-forest w-100" type="button" id="addOLevel" aria-label="Add O-Level result">+</button></div>
+      </div>
+      <div id="oLevelResultList" class="mt-2" aria-live="polite"></div>
+    </section>
+    <section class="form-section">
+      <h2 class="form-section-title">GCE A-Level</h2>
+      <div class="row g-3">
+        <div class="col-md-4"><label for="aLevelYear" class="form-label">Year completed</label><input class="form-control" type="number" id="aLevelYear" name="aLevelYear" min="1900" max="2100" value="<%= profile?.aLevelYear || '' %>"></div>
+        <div class="col-md-4"><label for="aLevelSeries" class="form-label">A-Level series</label><input class="form-control" id="aLevelSeries" name="aLevelSeries" placeholder="e.g. S1" value="<%= profile?.aLevelSeries || '' %>"></div>
+      </div>
+      <div class="row g-3 align-items-end mt-1">
+        <div class="col-md-5"><label for="aLevelSubject" class="form-label">Subject</label><input class="form-control" id="aLevelSubject" placeholder="e.g. Biology"></div>
+        <div class="col-md-5"><label for="aLevelGrade" class="form-label">Grade</label><input class="form-control" id="aLevelGrade" placeholder="e.g. B" maxlength="3"></div>
+        <div class="col-md-2"><button class="btn btn-outline-forest w-100" type="button" id="addALevel">Add result</button></div>
+      </div>
+      <div id="aLevelResultList" class="mt-2" aria-live="polite"></div>
+    </section>
+    <% const qualification = profile?.otherQualifications?.[0]; %>
+    <section class="form-section">
+      <h2 class="form-section-title">Other qualification <span class="text-secondary fw-normal small">(optional)</span></h2>
+      <div class="row g-3">
+        <div class="col-md-5"><label for="qualificationName" class="form-label">Qualification name</label><input class="form-control" id="qualificationName" name="qualificationName" placeholder="e.g. IT certificate" value="<%= qualification?.name || '' %>"></div>
+        <div class="col-md-3"><label for="qualificationYear" class="form-label">Year</label><input class="form-control" type="number" id="qualificationYear" name="qualificationYear" min="1900" max="2100" value="<%= qualification?.year || '' %>"></div>
+        <div class="col-md-12"><label for="qualificationDetails" class="form-label">Details</label><textarea class="form-control" id="qualificationDetails" name="qualificationDetails" rows="2"><%= qualification?.details || '' %></textarea></div>
+      </div>
+    </section>
+    <div class="d-flex flex-wrap gap-2 mt-4"><button type="submit" class="btn btn-forest px-4"><%= isEdit ? 'Save changes' : 'Save profile' %></button><a class="btn btn-outline-forest px-4" href="<%= isEdit ? '/student/profile' : '/student' %>">Cancel</a></div>
   </form>
 </main>
 <script src="/js/create-profile.js" defer></script><%- include('../partials/footer') %>

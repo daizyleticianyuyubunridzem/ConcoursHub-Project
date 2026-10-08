@@ -2,23 +2,23 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IStudentProfile extends Document {
     user: mongoose.Types.ObjectId;
-    dateOfBirth?: Date;
+    dateOfBirth?: Date | null;
     background: "general" | "technical";
     academicStatus: "lower_sixth" | "upper_sixth" | "completed";
-    oLevelYear?: number;
+    oLevelYear?: number | null;
     oLevelResults?: {
         subject: string;
         grade: string;
     }[];
-    aLevelYear?: number;
-    aLevelSeries?: string;
+    aLevelYear?: number | null;
+    aLevelSeries?: string | null;
     aLevelResults?: {
         subject: string;
         grade: string;
     }[];
     otherQualifications?: {
         name: string;
-        year?: number;
+        year?: number | null;
         details?: string;
     }[];
 }

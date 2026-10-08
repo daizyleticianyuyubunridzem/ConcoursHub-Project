@@ -1,6 +1,45 @@
 import mongoose from "mongoose";
 import { Request, Response, NextFunction } from "express";
 import StudentProfileService from "../services/studentProfileService";
+
+const values = (value: unknown): string[] => {
+    if (Array.isArray(value)) return value.map((item) => String(item ?? ""));
+    return value === undefined || value === null ? [] : [String(value)];
+};
+
+const buildProfileData = (body: Request["body"], userId: string) => {
+    const resultRows = (subjects: unknown, grades: unknown, label: string) => {
+        const subjectValues = values(subjects);
+        const gradeValues = values(grades);
+        const rows = subjectValues.map((subject, index) => ({
+            subject: subject.trim(),
+            grade: (gradeValues[index] ?? "").trim(),
+        })).filter((row) => row.subject || row.grade);
+        if (rows.some((row) => !row.subject || !row.grade)) {
+            throw new Error(`Each ${label} result must have both a subject and a grade.`);
+        }
+        return rows;
+    };
+
+    const year = (value: unknown) => value ? Number(value) : null;
+    return {
+        user: new mongoose.Types.ObjectId(userId),
+        dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
+        background: body.background,
+        academicStatus: body.academicStatus,
+        oLevelYear: year(body.oLevelYear),
+        oLevelResults: resultRows(body.oLevelSubject, body.oLevelGrade, "O-Level"),
+        aLevelYear: year(body.aLevelYear),
+        aLevelSeries: body.aLevelSeries || "",
+        aLevelResults: resultRows(body.aLevelSubject, body.aLevelGrade, "A-Level"),
+        otherQualifications: body.qualificationName ? [{
+            name: String(body.qualificationName).trim(),
+            year: year(body.qualificationYear),
+            details: body.qualificationDetails || "",
+        }] : [],
+    };
+};
+
 class StudentProfileViewController {
 
     // Display the student's profile page
@@ -35,7 +74,17 @@ class StudentProfileViewController {
         try {
             const profile = await StudentProfileService.getStudentProfileByUserId(req.session.userId!);
             if (profile) { res.redirect("/student/profile"); return; }
-            res.render("student/create-profile");
+            res.render("student/create-profile", { profile: null, isEdit: false });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async showEditProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const profile = await StudentProfileService.getStudentProfileByUserId(req.session.userId!);
+            if (!profile) { res.redirect("/student/profile/create"); return; }
+            res.render("student/create-profile", { profile, isEdit: true });
         } catch (error) {
             next(error);
         }
@@ -50,25 +99,6 @@ class StudentProfileViewController {
         try {
             const userId = req.session.userId!;
 
-            const {
-                dateOfBirth,
-                background,
-                academicStatus,
-
-                oLevelYear,
-                oLevelSubject,
-                oLevelGrade,
-
-                aLevelYear,
-                aLevelSeries,
-                aLevelSubject,
-                aLevelGrade,
-
-                qualificationName,
-                qualificationYear,
-                qualificationDetails
-            } = req.body;
-
 
             // Check whether the student already has a profile
             const existingProfile =
@@ -81,127 +111,7 @@ class StudentProfileViewController {
                 return;
             }
 
-            // Convert O-Level values into arrays
-            const oLevelSubjects =
-                Array.isArray(oLevelSubject)
-                    ? oLevelSubject
-                    : oLevelSubject
-                        ? [oLevelSubject]
-                        : [];
-
-            const oLevelGrades =
-                Array.isArray(oLevelGrade)
-                    ? oLevelGrade
-                    : oLevelGrade
-                        ? [oLevelGrade]
-                        : [];
-
-
-            // Create O-Level result objects
-            const oLevelResults = oLevelSubjects
-                .map((subject: string, index: number) => ({
-                    subject: subject.trim(),
-                    grade: String(
-                        oLevelGrades[index] ?? ""
-                    ).trim()
-                }))
-                .filter(
-                    (result: { subject: string; grade: string }) =>
-                        result.subject !== "" || result.grade !== ""
-                );
-
-                if (
-                    oLevelResults.some(
-                        (result: { subject: string; grade: string }) =>
-                            result.subject === "" || result.grade === ""
-                    )
-                ) {
-                    throw new Error(
-                        "Each O-Level result must have both a subject and a grade."
-                    );
-                }
-
-
-            // Convert A-Level values into arrays
-            const aLevelSubjects =
-                Array.isArray(aLevelSubject)
-                    ? aLevelSubject
-                    : aLevelSubject
-                        ? [aLevelSubject]
-                        : [];
-
-            const aLevelGrades =
-                Array.isArray(aLevelGrade)
-                    ? aLevelGrade
-                    : aLevelGrade
-                        ? [aLevelGrade]
-                        : [];
-
-
-            // Create A-Level result objects
-            const aLevelResults = aLevelSubjects
-                .map((subject: string, index: number) => ({
-                    subject: subject.trim(),
-                    grade: String(
-                        aLevelGrades[index] ?? ""
-                    ).trim()
-                }))
-                .filter(
-                    (result: { subject: string; grade: string }) =>
-                        result.subject !== "" || result.grade !== ""
-                );
-
-                if (
-                    aLevelResults.some(
-                        (result: { subject: string; grade: string }) =>
-                            result.subject === "" || result.grade === ""
-                    )
-                ) {
-                    throw new Error(
-                        "Each A-Level result must have both a subject and a grade."
-                    );
-                }
-
-            // Prepare the complete student profile
-            const profileData = {
-
-                user: new mongoose.Types.ObjectId(userId),
-
-                dateOfBirth: dateOfBirth || undefined,
-                background,
-                academicStatus,
-                oLevelYear:
-                    oLevelYear
-                        ? Number(oLevelYear)
-                        : undefined,
-
-                oLevelResults,
-                aLevelYear:
-                    aLevelYear
-                        ? Number(aLevelYear)
-                        : undefined,
-
-                aLevelSeries:
-                    aLevelSeries || undefined,
-
-                aLevelResults,
-
-                otherQualifications:
-                    qualificationName
-                        ? [
-                            {
-                                name: qualificationName,
-                                year:
-                                    qualificationYear? Number(qualificationYear)
-                                        : undefined,
-                                details:
-                                    qualificationDetails ||
-                                    undefined
-                            }
-                        ]
-                        : []
-            };
-
+            const profileData = buildProfileData(req.body, userId);
 
             // Save the profile
             await StudentProfileService.createStudentProfile(
@@ -209,6 +119,18 @@ class StudentProfileViewController {
             );
 
             // Return to the profile page
+            res.redirect("/student/profile");
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId = req.session.userId!;
+            const profile = await StudentProfileService.getStudentProfileByUserId(userId);
+            if (!profile) { res.redirect("/student/profile/create"); return; }
+            await StudentProfileService.updateStudentProfile(profile._id.toString(), buildProfileData(req.body, userId));
             res.redirect("/student/profile");
         } catch (error) {
             next(error);

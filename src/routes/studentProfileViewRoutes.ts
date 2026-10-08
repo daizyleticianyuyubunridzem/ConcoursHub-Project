@@ -22,4 +22,7 @@ router.post(
     StudentProfileViewController.createProfile
 );
 
+router.get("/edit", StudentProfileViewController.showEditProfile);
+router.post("/edit", StudentProfileViewController.updateProfile);
+
 export default router;

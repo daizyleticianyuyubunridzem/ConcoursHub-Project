@@ -53,7 +53,19 @@ class AuthViewController {
             res.redirect(user.role === "student" ? "/student" : "/admin");
 
         } catch (error) {
-            res.status(401).render("auth/login", { error: error instanceof Error ? error.message : "Unable to sign in." });
+            const message = error instanceof Error ? error.message : "";
+            const expectedAuthErrors = ["Invalid email or password", "This account has been deactivated"];
+            const isExpectedAuthError = expectedAuthErrors.includes(message);
+
+            if (isExpectedAuthError) {
+                res.status(401).render("auth/login", { error: message });
+                return;
+            }
+
+            console.error("Login could not reach the authentication service:", error);
+            res.status(503).render("auth/login", {
+                error: "We couldn't sign you in right now. Please try again in a few minutes.",
+            });
         }
     }
 
@@ -66,11 +78,24 @@ class AuthViewController {
             req.session.role = user.role;
             res.redirect("/student/profile/create");
         } catch (error) {
-            if (error instanceof Error && error.message.toLowerCase().includes("email")) {
+            const duplicateEmail = error instanceof Error && (
+                error.message === "This email already exists" ||
+                ("code" in error && error.code === 11000 &&
+                    "keyPattern" in error &&
+                    typeof error.keyPattern === "object" && error.keyPattern !== null &&
+                    "email" in error.keyPattern)
+            );
+
+            if (duplicateEmail) {
                 res.status(400).render("auth/register", { error: "An account with this email already exists.", values: req.body });
                 return;
             }
-            next(error);
+
+            console.error("Registration could not reach the account service:", error);
+            res.status(503).render("auth/register", {
+                error: "We couldn't create your account right now. Please try again in a few minutes.",
+                values: { name: req.body.name, email: req.body.email },
+            });
         }
     }
 

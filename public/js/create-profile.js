@@ -1,7 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const oLevelResults = [];
-  const aLevelResults = [];
   const form = document.getElementById("studentProfileForm");
+  const parseInitial = (value) => {
+    try { return JSON.parse(value || "[]"); } catch { return []; }
+  };
+  const oLevelResults = parseInitial(form?.dataset.initialOLevel);
+  const aLevelResults = parseInitial(form?.dataset.initialALevel);
 
   const renderResults = (items, listId, level) => {
     const list = document.getElementById(listId);
@@ -41,6 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("addOLevel")?.addEventListener("click", () => addResult("oLevel", oLevelResults, "oLevelResultList"));
   document.getElementById("addALevel")?.addEventListener("click", () => addResult("aLevel", aLevelResults, "aLevelResultList"));
+  renderResults(oLevelResults, "oLevelResultList", "oLevel");
+  renderResults(aLevelResults, "aLevelResultList", "aLevel");
 
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-remove-result]");
