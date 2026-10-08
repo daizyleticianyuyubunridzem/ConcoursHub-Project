@@ -1,4 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const adminToggle = document.querySelector("[data-admin-nav-toggle]");
+  const adminSidebar = document.querySelector(".admin-sidebar");
+  const adminBackdrop = document.querySelector("[data-admin-nav-close]");
+  const closeAdminNav = () => {
+    adminSidebar?.classList.remove("is-open");
+    adminBackdrop?.classList.remove("is-open");
+    adminToggle?.setAttribute("aria-expanded", "false");
+  };
+  adminToggle?.addEventListener("click", () => {
+    const open = adminSidebar?.classList.toggle("is-open") || false;
+    adminBackdrop?.classList.toggle("is-open", open);
+    adminToggle.setAttribute("aria-expanded", String(open));
+  });
+  adminBackdrop?.addEventListener("click", closeAdminNav);
+  adminSidebar?.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeAdminNav));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeAdminNav();
+  });
+
   const toggle = document.querySelector("[data-nav-toggle]");
   const nav = document.querySelector(".app-nav-collapse");
   if (toggle && nav) {

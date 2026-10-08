@@ -4,17 +4,17 @@ class UserRepository {
 
     //get all users
     async findAll(): Promise<IUser[]> {
-        return await User.find();
+        return await User.find().select("name email role isActive createdAt");
     }
 
     // Find one user by ID
     async findById( id: string ): Promise<IUser | null> {
-        return await User.findById(id);
+        return await User.findById(id).select("name email role isActive createdAt");
     }
 
     // Find a user by email
     async findByEmail( email: string  ): Promise<IUser | null> {
-        return await User.findOne({ email });
+        return await User.findOne({ email: email.trim().toLowerCase() });
     }
 
     // Create a new user
@@ -33,7 +33,15 @@ class UserRepository {
                 new: true,
                 runValidators: true,
             }
-        );
+        ).select("name email role isActive createdAt");
+    }
+
+    async setStudentActiveStatus(id: string, isActive: boolean): Promise<IUser | null> {
+        return await User.findOneAndUpdate(
+            { _id: id, role: "student" },
+            { $set: { isActive } },
+            { new: true, runValidators: true }
+        ).select("name email role isActive createdAt");
     }
 
     // Delete  user

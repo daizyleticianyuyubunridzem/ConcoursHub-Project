@@ -46,7 +46,11 @@ class UserService {
     // delete a user
     async deleteUser( id: string
     ): Promise<IUser | null> {
-        return await userRepository.delete(id);
+        return await userRepository.setStudentActiveStatus(id, false);
+    }
+
+    async setStudentActiveStatus(id: string, isActive: boolean): Promise<IUser | null> {
+        return await userRepository.setStudentActiveStatus(id, isActive);
     }
 }
 

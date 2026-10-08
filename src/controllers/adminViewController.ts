@@ -8,6 +8,8 @@ import ApplicationSession from "../models/applicationSessionModel";
 import Requirement from "../models/requirementModel";
 import User from "../models/userModel";
 import StudentProfile from "../models/studentProfileModel";
+import UserService from "../services/userService";
+import { updateAdminAccountSchema } from "../validators/userValidator";
 
 type Field = { name: string; label: string; type?: string; required?: boolean; multiple?: boolean; defaultValue?: string; options?: { value: string; label: string }[] };
 type Row = { id: string; cells: Record<string, string>; record: Record<string, unknown> };
@@ -34,6 +36,14 @@ class AdminViewController {
     async resource(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const page = String(req.params.page);
+            if (page === "users") {
+                const [students, admins] = await Promise.all([
+                    User.find({ role: "student" }).select("name email isActive createdAt").sort({ createdAt: -1 }).lean(),
+                    User.find({ role: "admin" }).select("name email isActive createdAt").sort({ createdAt: -1 }).lean(),
+                ]);
+                res.render("admin/users", { active: "users", students, admins, currentAdminId: req.session.userId });
+                return;
+            }
             const [institutions, schools, departments, programmes, opportunities, sessions] = await Promise.all([
                 Institution.find().sort({ name: 1 }).lean(),
                 School.find().populate("institution").sort({ name: 1 }).lean(),
@@ -68,7 +78,6 @@ class AdminViewController {
                 requirements: { title: "Requirements", description: "Capture the exact published requirements for an application session.", endpoint: "/requirements", fields: [
                     { name: "applicationSession", label: "Application session", type: "select", options: refOptions.sessions, required: true }, { name: "type", label: "Requirement type", type: "select", options: ["subject", "series", "background", "age"].map((v) => ({ value: v, label: v })) , required: true }, { name: "name", label: "Requirement title", required: true }, { name: "description", label: "Details", type: "textarea" }, { name: "level", label: "Exam level", type: "select", options: [{ value: "o_level", label: "O-Level" }, { value: "a_level", label: "A-Level" }] }, { name: "subject", label: "Subject" }, { name: "minimumGrade", label: "Minimum grade", type: "select", options: ["A", "B", "C", "D", "E", "F"].map((v) => ({ value: v, label: v })) }, { name: "requiredSeries", label: "Required series" }, { name: "requiredBackground", label: "Required background", type: "select", options: [{ value: "general", label: "General" }, { value: "technical", label: "Technical" }] }, { name: "minimumAge", label: "Minimum age", type: "number" }, { name: "maximumAge", label: "Maximum age", type: "number" }, { name: "isMandatory", label: "Mandatory", type: "checkbox", defaultValue: "true" },
                 ], columns: ["name", "type", "applicationSession", "isMandatory"], rows: await Requirement.find().populate("applicationSession").sort({ name: 1 }).lean().then((items: any[]) => items.map((x) => row(x, { name: x.name, type: x.type, applicationSession: x.applicationSession?.academicYear, isMandatory: x.isMandatory ? "Yes" : "No" }, { applicationSession: refId(x.applicationSession), type: x.type, name: x.name, description: x.description, level: x.level, subject: x.subject, minimumGrade: x.minimumGrade, requiredSeries: x.requiredSeries, requiredBackground: x.requiredBackground, minimumAge: x.minimumAge, maximumAge: x.maximumAge, isMandatory: x.isMandatory }))) },
-                users: { title: "Student accounts", description: "Review student accounts and profile completion. Passwords are never displayed here.", endpoint: "", fields: [], columns: ["name", "email", "role", "createdAt"], rows: await User.find().select("name email role isActive createdAt").sort({ createdAt: -1 }).lean().then((items: any[]) => items.map((x) => row(x, { name: x.name, email: x.email, role: x.role, createdAt: dateInput(x.createdAt) }, {}))) },
             };
             const config = configs[page];
             if (!config) { res.status(404).render("errors/404"); return; }
@@ -79,8 +88,47 @@ class AdminViewController {
     async account(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await User.findById(req.session.userId).select("name email role createdAt").lean();
-            res.render("admin/account", { active: "account", user });
+            res.render("admin/account", { active: "account", user, updated: req.query.updated === "1" });
         } catch (error) { next(error); }
+    }
+
+    async editAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const user = await User.findById(req.session.userId).select("name email role").lean();
+            if (!user) { res.status(404).render("errors/404"); return; }
+            res.render("admin/account-edit", { active: "account", user, error: null });
+        } catch (error) { next(error); }
+    }
+
+    async updateAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const parsed = updateAdminAccountSchema.safeParse(req.body);
+        const values = { name: req.body.name, email: req.body.email };
+        if (!parsed.success) {
+            res.status(400).render("admin/account-edit", {
+                active: "account", user: values, error: parsed.error.issues[0]?.message,
+            });
+            return;
+        }
+
+        try {
+            const { name, email, password } = parsed.data;
+            const updates = { name, email: email.toLowerCase(), ...(password ? { password } : {}) };
+            const user = await UserService.updateUser(req.session.userId!, updates);
+            if (!user) { res.status(404).render("errors/404"); return; }
+            res.redirect("/admin/account?updated=1");
+        } catch (error) {
+            const duplicateEmail = typeof error === "object" && error !== null && "code" in error && error.code === 11000;
+            if (duplicateEmail) {
+                res.status(409).render("admin/account-edit", {
+                    active: "account", user: values, error: "That email address is already in use.",
+                });
+                return;
+            }
+            console.error("Administrator account update failed:", error);
+            res.status(503).render("admin/account-edit", {
+                active: "account", user: values, error: "We couldn't update your account right now. Please try again in a few minutes.",
+            });
+        }
     }
 }
 

@@ -1,2 +1,18 @@
-<%- include('../partials/head', { title: 'Administrator account' }) %><%- include('../partials/admin-nav', { active }) %>
-<main class="container app-container page-shell"><p class="eyebrow">ADMINISTRATION</p><h1 class="page-title">Administrator account</h1><p class="page-lede">Your signed-in account details.</p><section class="panel p-4 mt-4"><dl class="row detail-list mb-0"><dt class="col-sm-3">Name</dt><dd class="col-sm-9"><%= user?.name || '—' %></dd><dt class="col-sm-3">Email</dt><dd class="col-sm-9"><%= user?.email || '—' %></dd><dt class="col-sm-3">Role</dt><dd class="col-sm-9"><%= user?.role || 'Administrator' %></dd><dt class="col-sm-3">Account created</dt><dd class="col-sm-9"><%= user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—' %></dd></dl></section></main><%- include('../partials/footer') %>
+<%- include('../partials/head', { title: 'Administrator account' }) %>
+<%- include('../partials/admin-nav', { active }) %>
+<main class="container app-container page-shell admin-main">
+  <p class="eyebrow">ADMINISTRATION</p>
+  <h1 class="page-title">Administrator account</h1>
+  <p class="page-lede">Your signed-in account details.</p>
+  <% if (updated) { %><div class="alert alert-success mt-4" role="status">Your account details were updated.</div><% } %>
+  <section class="panel p-4 mt-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4"><div><h2 class="panel-heading h4 mb-0">Account details</h2></div><a class="btn btn-outline-forest" href="/admin/account/edit">Edit account</a></div>
+    <dl class="row detail-list mb-0">
+      <dt class="col-sm-3">Name</dt><dd class="col-sm-9"><%= user?.name || '—' %></dd>
+      <dt class="col-sm-3">Email</dt><dd class="col-sm-9"><%= user?.email || '—' %></dd>
+      <dt class="col-sm-3">Role</dt><dd class="col-sm-9"><%= user?.role || 'Administrator' %></dd>
+      <dt class="col-sm-3">Account created</dt><dd class="col-sm-9"><%= user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—' %></dd>
+    </dl>
+  </section>
+</main>
+<%- include('../partials/footer') %>

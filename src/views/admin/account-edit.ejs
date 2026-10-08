@@ -1,0 +1,17 @@
+<%- include('../partials/head', { title: 'Edit administrator account' }) %>
+<%- include('../partials/admin-nav', { active }) %>
+<main class="container app-container page-shell admin-main">
+  <p class="eyebrow">ADMINISTRATION</p>
+  <h1 class="page-title">Edit your account</h1>
+  <p class="page-lede">Update the name or email used for your administrator account. Leave the password blank to keep it unchanged.</p>
+  <section class="panel p-4 p-lg-5 mt-4">
+    <% if (error) { %><div class="alert alert-danger" role="alert"><%= error %></div><% } %>
+    <form action="/admin/account/edit" method="post" class="row g-3">
+      <div class="col-md-6"><label class="form-label" for="name">Full name</label><input class="form-control" id="name" name="name" value="<%= user?.name || '' %>" autocomplete="name" required minlength="2"></div>
+      <div class="col-md-6"><label class="form-label" for="email">Email address</label><input class="form-control" id="email" name="email" type="email" value="<%= user?.email || '' %>" autocomplete="email" required></div>
+      <div class="col-md-6"><label class="form-label" for="password">New password <span class="text-secondary fw-normal">(optional)</span></label><input class="form-control" id="password" name="password" type="password" autocomplete="new-password" minlength="6"><div class="form-text">If you enter a new password, use at least 6 characters.</div></div>
+      <div class="col-12 d-flex flex-wrap gap-2 mt-4"><button class="btn btn-forest" type="submit">Save changes</button><a class="btn btn-outline-forest" href="/admin/account">Cancel</a></div>
+    </form>
+  </section>
+</main>
+<%- include('../partials/footer') %>

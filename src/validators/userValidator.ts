@@ -33,3 +33,16 @@ export const loginUserSchema = z.object({
 
 });
 
+export const updateUserStatusSchema = z.object({
+    isActive: z.boolean(),
+});
+
+export const updateAdminAccountSchema = z.object({
+    name: z.string().trim().min(2, "Name must be at least 2 characters long."),
+    email: z.string().trim().email("Please provide a valid email address."),
+    password: z.union([
+        z.literal(""),
+        z.string().min(6, "Password must be at least 6 characters long."),
+    ]),
+});
+
