@@ -62,6 +62,19 @@ class RequirementController {
         }
     }
 
+    async createRequirements(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const requirements = await RequirementService.createRequirements(req.body);
+            res.status(201).json(requirements);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     // Update an existing requirement
     async updateRequirement(
         req: Request,

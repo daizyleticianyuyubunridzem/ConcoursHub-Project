@@ -26,11 +26,21 @@ import adminViewRoutes from "./routes/adminViewRoutes";
 import publicExploreRoutes from "./routes/publicExploreRoutes";
 
 const app = express();
-app.use(helmet());
 
+const trustProxyHopsValue = process.env.TRUST_PROXY_HOPS;
+
+if (trustProxyHopsValue !== undefined) {
+    const trustProxyHops = Number(trustProxyHopsValue);
+    if (!Number.isInteger(trustProxyHops) || trustProxyHops < 0) {
+        throw new Error("TRUST_PROXY_HOPS must be a non-negative integer.");
+    }
+    if (trustProxyHops > 0) {
+        app.set("trust proxy", trustProxyHops);
+    }
+}
+
+app.use(helmet());
 const PORT = process.env.PORT || 3000;
- 
-connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -69,6 +79,12 @@ app.use("/", authViewRoutes);
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port: ${PORT}`)
-});
+const startServer = async (): Promise<void> => {
+    await connectDB();
+
+    app.listen(PORT, () => {
+        console.log(`Server is running on port: ${PORT}`);
+    });
+};
+
+void startServer();

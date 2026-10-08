@@ -8,8 +8,6 @@ const objectIdSchema = z
         "Must be a valid MongoDB ObjectId."
     );
 
-export const checkEligibilitySchema = z.object({ 
-    studentProfileId: objectIdSchema,
+export const checkEligibilitySchema = z.object({
     applicationSessionId: objectIdSchema,
 });
-

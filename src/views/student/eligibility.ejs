@@ -1,11 +1,37 @@
 <%- include('../partials/head', { title: 'Eligibility guidance' }) %>
 <%- include('../partials/student-nav', { active: 'eligibility' }) %>
-<main class="container app-container page-shell"><a class="small text-decoration-none" href="/student/opportunities/<%= session._id %>">← Back to concours details</a><p class="eyebrow mt-4">A REQUIREMENTS COMPARISON</p><h1 class="page-title">Your readiness snapshot</h1><p class="page-lede">For <strong><%= session.admissionOpportunity.name %></strong> · <%= session.academicYear %></p>
-  <div class="notice-callout my-4"><strong>Please read:</strong> This is an informational comparison based on your profile and requirements recorded in ConcoursHub. It is not an official eligibility decision. Confirm every requirement with the institution.</div>
-  <section class="panel p-4 p-lg-5"><div class="d-flex align-items-center gap-3 mb-4"><span class="feature-icon"><%= result.eligible ? '✓' : '!' %></span><div><span class="eyebrow">GUIDANCE RESULT</span><h2 class="panel-heading h3 mb-0"><%= result.eligible ? 'No recorded mismatch found' : 'Some requirements need attention' %></h2></div></div><p class="text-secondary"><%= result.eligible ? 'Based on the details available in your profile and the requirements recorded here, no mandatory mismatch was found. Verify with the institution before acting.' : 'Review the items below and confirm the requirements with the institution. Missing profile details can affect this comparison.' %></p>
-    <% if(result.passedRequirements.length) { %><h3 class="panel-heading h5 mt-4">Matched in your profile</h3><ul class="list-group list-group-flush mb-3"><% result.passedRequirements.forEach((item) => { %><li class="list-group-item px-0"><span class="text-forest me-2">✓</span><%= item %></li><% }) %></ul><% } %>
-    <% if(result.failedRequirements.length) { %><h3 class="panel-heading h5 mt-4">Check these points</h3><ul class="list-group list-group-flush"><% result.failedRequirements.forEach((item) => { %><li class="list-group-item px-0"><span class="text-danger me-2">•</span><%= item %></li><% }) %></ul><% } %>
-    <% if(!result.failedRequirements.length && !result.passedRequirements.length) { %><p class="small text-secondary border-top pt-3">No specific requirements are available to compare for this session yet.</p><% } %>
+<main class="container app-container page-shell">
+  <a class="small text-decoration-none" href="/student/opportunities/<%= session._id %>">← Back to concours details</a>
+  <p class="eyebrow mt-4">A REQUIREMENTS COMPARISON</p>
+  <h1 class="page-title">Your readiness snapshot</h1>
+  <p class="page-lede">For <strong><%= session.admissionOpportunity.name %></strong> · <%= session.academicYear %></p>
+  <div class="notice-callout my-4">
+    <strong>Please read:</strong> This is an informational comparison based on your profile and requirements recorded in ConcoursHub. It is not an official eligibility decision. Confirm every requirement with the institution.</div>
+  <section class="panel p-4 p-lg-5">
+    <div class="d-flex align-items-center gap-3 mb-4"><span class="feature-icon"><%= result.eligible === null ? 'i' : result.eligible ? '✓' : '!' %></span>
+      <div><span class="eyebrow">GUIDANCE RESULT</span>
+        <h2 class="panel-heading h3 mb-0"><%= result.eligible === null ? 'We can’t assess this section yet' : result.eligible ? 'No recorded mismatch found' : 'Some requirements need attention' %></h2></div>
+      </div>
+      <p class="text-secondary"><%= result.eligible === null ? result.message : result.eligible ? 'Based on the details in your profile and the recorded requirements, no mandatory mismatch was found. Verify with the institution before acting.' : 'Review the items below and confirm the requirements with the institution. Missing profile details can affect this comparison.' %></p>
+         
+    <% if(result.passedRequirements.length) { %>
+      <h3 class="panel-heading h5 mt-4">Matched requirements</h3>
+      <ul class="list-group list-group-flush mb-3"><% result.passedRequirements.forEach((item) => { %>
+        <li class="list-group-item px-0">
+          <span class="text-forest me-2">✓</span>
+          <%= item %>
+        </li><% }) %>
+      </ul><% } %>
+    <% if(result.failedRequirements.length) { %>
+      <h3 class="panel-heading h5 mt-4">Check these points</h3>
+      <ul class="list-group list-group-flush">
+        <% result.failedRequirements.forEach((item) => { %>
+          <li class="list-group-item px-0"><span class="text-danger me-2">•</span>
+            <%= item %>
+          </li><% }) %>
+        </ul><% } %>
+    <% if(!result.failedRequirements.length && !result.passedRequirements.length) { %>
+      <p class="small text-secondary border-top pt-3"><%= result.message || 'No specific requirements are available to compare for this session yet.' %></p><% } %>
     <a href="/student/opportunities/<%= session._id %>" class="btn btn-outline-forest mt-4">Review official information</a>
   </section>
 </main><%- include('../partials/footer') %>

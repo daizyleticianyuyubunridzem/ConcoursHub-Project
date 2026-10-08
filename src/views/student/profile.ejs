@@ -1,13 +1,55 @@
 <%- include('../partials/head', { title: 'My academic profile' }) %>
 <%- include('../partials/student-nav', { active: 'profile' }) %>
 <main class="container app-container page-shell">
-  <p class="eyebrow">YOUR RECORD</p><h1 class="page-title">My academic profile</h1><p class="page-lede">Your information helps you compare your results with requirements published on concours listings.</p>
+  <p class="eyebrow">YOUR RECORD</p>
+  <h1 class="page-title">My academic profile</h1>
+  <p class="page-lede">Your information helps you compare your results with requirements published on concours listings.</p>
   <% if (profile) { %>
-    <section class="panel p-4 p-lg-5 mt-4"><div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4"><div><span class="status-pill">PROFILE SAVED</span><h2 class="panel-heading h3 mt-3">Academic background</h2></div><a class="btn btn-outline-forest" href="/student/profile/edit">Edit profile</a></div>
+    <section class="panel p-4 p-lg-5 mt-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+          <span class="status-pill">PROFILE SAVED</span>
+          <h2 class="panel-heading h3 mt-3">Academic background</h2>
+        </div>
+        <a class="btn btn-outline-forest" href="/student/profile/edit">Edit profile</a></div>
       <dl class="row detail-list mb-0"><dt class="col-sm-4">Academic status</dt><dd class="col-sm-8"><%= ({lower_sixth:'Lower Sixth',upper_sixth:'Upper Sixth',completed:'Completed A-Level'})[profile.academicStatus] || profile.academicStatus %></dd><dt class="col-sm-4">Educational background</dt><dd class="col-sm-8"><%= profile.background === 'technical' ? 'Technical' : 'General' %></dd><dt class="col-sm-4">Date of birth</dt><dd class="col-sm-8"><%= profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString() : 'Not provided' %></dd><dt class="col-sm-4">A-Level series</dt><dd class="col-sm-8"><%= profile.aLevelSeries || 'Not provided' %></dd></dl>
-      <hr class="my-4"><div class="row g-4"><div class="col-md-6"><h3 class="panel-heading h5">O-Level results</h3><% if (profile.oLevelResults?.length) { %><ul class="list-group list-group-flush"><% profile.oLevelResults.forEach((result) => { %><li class="list-group-item px-0 d-flex justify-content-between"><span><%= result.subject %></span><span class="fw-semibold"><%= result.grade %></span></li><% }) %></ul><% } else { %><p class="text-secondary small">No O-Level results added.</p><% } %></div><div class="col-md-6"><h3 class="panel-heading h5">A-Level results</h3><% if (profile.aLevelResults?.length) { %><ul class="list-group list-group-flush"><% profile.aLevelResults.forEach((result) => { %><li class="list-group-item px-0 d-flex justify-content-between"><span><%= result.subject %></span><span class="fw-semibold"><%= result.grade %></span></li><% }) %></ul><% } else { %><p class="text-secondary small">No A-Level results added.</p><% } %></div></div>
+      <hr class="my-4">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <h3 class="panel-heading h5">O-Level results</h3>
+          <% if (profile.oLevelResults?.length) { %>
+            <ul class="list-group list-group-flush">
+              <% profile.oLevelResults.forEach((result) => { %>
+              <li class="list-group-item px-0 d-flex justify-content-between">
+                <span><%= result.subject %></span>
+                <span class="fw-semibold"><%= result.grade %></span>
+              </li>
+            <% }) %>
+            </ul><% } else { %>
+              <p class="text-secondary small">No O-Level results added.</p><% } %>
+            </div>
+            <div class="col-md-6">
+              <h3 class="panel-heading h5">A-Level results</h3>
+              <% if (profile.aLevelResults?.length) { %>
+                <ul class="list-group list-group-flush">
+                  <% profile.aLevelResults.forEach((result) =>
+                   { %><li class="list-group-item px-0 d-flex justify-content-between">
+                    <span><%= result.subject %></span>
+                    <span class="fw-semibold"><%= result.grade %></span>
+                  </li>
+                  <% }) %>
+                </ul>
+                <% } else 
+                { %><p class="text-secondary small">No A-Level results added.</p>
+                <% } %>
+              </div>
+            </div>
     </section>
     <div class="notice-callout mt-3">Your profile is private to your account and is used only to help you compare your results with published requirements.</div>
-  <% } else { %><section class="panel empty-state mt-4"><span class="feature-icon mx-auto">◎</span><h2 class="panel-heading h4 mt-3">Your profile is not set up yet</h2><p class="text-secondary">Add your academic background to receive a requirements comparison.</p><a href="/student/profile/create" class="btn btn-forest">Create my profile</a></section><% } %>
+  <% } else { %><section class="panel empty-state mt-4">
+    <span class="feature-icon mx-auto">◎</span>
+    <h2 class="panel-heading h4 mt-3">Your profile is not set up yet</h2>
+    <p class="text-secondary">Add your academic background to receive a requirements comparison.</p>
+    <a href="/student/profile/create" class="btn btn-forest">Create my profile</a></section><% } %>
 </main>
 <%- include('../partials/footer') %>

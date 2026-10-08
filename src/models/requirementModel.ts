@@ -13,7 +13,7 @@ export interface IRequirement extends Document {
     minimumGrade?: string;
 
     requiredSeries?: string;
-    requiredBackground?: "general" | "technical";
+    requiredBackground?: "general" | "technical" | null;
 
     minimumAge?: number;
     maximumAge?: number;

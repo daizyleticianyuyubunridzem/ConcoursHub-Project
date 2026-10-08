@@ -7,6 +7,7 @@ import roleMiddleware from "../middlewares/roleMiddleware";
 import validate from "../middlewares/validate";
 
 import {
+    createRequirementBulkSchema,
     createRequirementSchema,
     updateRequirementSchema
 } from "../validators/requirementValidator";
@@ -14,6 +15,7 @@ import {
 const router = Router();
 
 router.get("/", RequirementController.getAllRequirements);
+router.post("/bulk", authMiddleware, roleMiddleware("admin"), validate(createRequirementBulkSchema), RequirementController.createRequirements);
 router.post( "/", authMiddleware, roleMiddleware("admin"), validate(createRequirementSchema), RequirementController.createRequirement );
 router.get("/:id", RequirementController.getRequirementById);
 router.put( "/:id", authMiddleware, roleMiddleware("admin"), validate(updateRequirementSchema),

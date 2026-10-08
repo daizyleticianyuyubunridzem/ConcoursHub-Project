@@ -30,6 +30,12 @@ class RequirementRepository {
         return await Requirement.create(data);
     }
 
+    async createMany(
+        data: Partial<IRequirement>[]
+    ): Promise<IRequirement[]> {
+        return await Requirement.insertMany(data) as IRequirement[];
+    }
+
     //update a requirement
     async update(
         id: string,
