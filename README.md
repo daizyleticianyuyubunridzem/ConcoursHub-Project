@@ -70,3 +70,9 @@ npm start      # Start the compiled application
 * **Admin dashboard:** `/admin`
 
 ConcoursHub uses server-rendered EJS pages and is not currently configured as a separate frontend application with a cross-origin API.
+
+## Deployed Application on render
+**Live URL:**
+https://concourshub-project.onrender.com
+
+
