@@ -75,4 +75,13 @@ ConcoursHub uses server-rendered EJS pages and is not currently configured as a 
 **Live URL:**
 https://concourshub-project.onrender.com
 
+## admin Account
+To access admin account use:
+**email: admin@concourshub.com
+password: admin123**
+
+
+
+
+
 
